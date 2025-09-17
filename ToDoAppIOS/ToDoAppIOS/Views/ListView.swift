@@ -1,48 +1,39 @@
 //
 //  ListView.swift
-//  Todo
+//  ToDoAppIOS
 //
-//  Created by Рома Котков on 13.09.2025.
+//  Created by Рома Котков on 17.09.2025.
 //
 
 import SwiftUI
 
 struct ListView: View {
     
-    @State var items: [ItemModel] = [
-            ItemModel(title: "Первая задача", isCompleted: false),
-            ItemModel(title: "Вторая задача", isCompleted: true),
-            ItemModel(title: "Третья задача", isCompleted: false)
-        ]
-
+    @State var showAddView: Bool = false
+    
     var body: some View {
-        List{
-            ForEach(items){
-                item in ListRowView(item: item)
+        NavigationStack{
+            List{
                 
             }
-            .onDelete(perform: deleteItem)
-            .onMove(perform: moveItem)
+            .navigationTitle(Text("Список"))
+            .toolbar{
+                ToolbarItem(placement: .navigationBarTrailing){
+                    Button{
+                        showAddView = true
+                    }label: {
+                        Image(systemName:"plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $showAddView) {
+                AddToDoView()
+            }
+                
         }
-        .navigationTitle("Список дел")
-        .navigationBarItems(leading: EditButton(), trailing: NavigationLink("Добавить", destination: AddView()))
-    }
-    
-    func deleteItem(indexSet: IndexSet) {
-        items.remove(atOffsets: indexSet)
-    }
-    
-    func moveItem(from: IndexSet, to: Int){
-        items.move(fromOffsets: from, toOffset: to)
     }
 }
 
-struct ListView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            ListView()
-        }
-        
-    }
+#Preview {
+    ListView()
 }
-
