@@ -11,8 +11,11 @@ struct AddToDoView: View {
     
     @Environment(\.dismiss) var dismiss
     @State private var title: String = ""
+    @State private var note: String = ""
     @State private var selectedDate: Date? = nil
     @State private var showDatePicker: Bool = false
+    @State private var setNotification: Bool = false
+    @FocusState private var isFocusedText: Bool
     
     private var dateFormatter: DateFormatter {
             let formatter = DateFormatter()
@@ -32,46 +35,121 @@ struct AddToDoView: View {
                             .fontWeight(.bold)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         TextField("", text: $title)
+                            .focused($isFocusedText)
                             .padding(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                             )
                             .padding(.horizontal)
+                            
                     }
+                    .toolbar{
+                        ToolbarItemGroup(placement: .keyboard){
+                            Spacer()
+                            Button("Готово"){
+                                isFocusedText = false
+                                
+                            }
+                        
+                        }
+                    }
+                    
                     // MARK: - Date Calendar
                     VStack(alignment: .leading, spacing: 15){
-                        Text("Дата")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        HStack{
+                            Image(systemName: "calendar")
+                                .foregroundStyle(.secondary)
+                            Text("Дата")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            Spacer()
+                                
+                        }
+                        
                         if let date = selectedDate {
-                                        Text(dateFormatter.string(from: date))
+                            Text(dateFormatter.string(from: date))
                                             .foregroundColor(.blue)
                                             .onTapGesture { showDatePicker = true }
                                             .frame(maxWidth: .infinity, alignment: .center)
+                                            .padding(10)
                         } else {
-                            Button(action: { showDatePicker = true }) {
+                            Button(action: { showDatePicker = true;
+                                }) {
                                 HStack {
                                     Image(systemName: "plus")
                                     Text("Добавить дату")
                                 }
                                 .foregroundColor(.blue)
                                 .frame(maxWidth: .infinity, alignment: .center)
-                            }
+                            }.padding(10)
                         }
+                    }
+                    //MARK: - Notification
+                    VStack(alignment: .leading, spacing: 15 ){
+                        HStack{
+                            Image(systemName: "bell")
+                                .foregroundStyle(.secondary)
+                            Text("Напоминание")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Spacer()
+                        }
+                        Button (action: {setNotification = true}){
+                            HStack {
+                                Image(systemName: "plus")
+                                Text("Добавить напоминание")
+                            }
+                            .foregroundColor(.blue)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        }.padding(.vertical, 10)
+                        
+                        
+                        
+                        
                     }
                     //MARK: - Category Scroll
                     VStack(alignment: .leading, spacing: 15 ){
-                        Text("Категория")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        HStack{
+                            Image(systemName: "paintbrush").foregroundStyle(.secondary)
+                            Text("Категория")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                        }
                         
                         CategoryScrollView()
                     
                     }
-                    //MARK: - Reminder
+                    //MARK: - Text
+                    VStack(alignment: .leading, spacing: 15 ){
+                        HStack{
+                            Image(systemName: "pencil")
+                                .foregroundStyle(.secondary)
+                            Text("Заметка")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Spacer()
+                        }
+                
+                        TextEditor(text: $note)
+                            .focused($isFocusedText)
+                            .padding(.top, 4)
+                            .frame(minHeight: 150)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                            .clipped()
+                            .padding()
+                    }
+                    
+                    //MARK: - //
                     
                     
                 }
@@ -90,18 +168,67 @@ struct AddToDoView: View {
                     }
                 }
             }
+            //MARK: -DataPicker
             .sheet(isPresented: $showDatePicker) {
-                DatePicker(
-                    "",
-                    selection: Binding(
-                        get: { selectedDate ?? Date() },
-                        set: { selectedDate = $0 }
-                    ),
-                    displayedComponents: .date
-                )
-                .datePickerStyle(.graphical)
-                .environment(\.locale, Locale(identifier: "ru_RU"))
-                .presentationDetents([.medium])
+                NavigationStack{
+                    VStack{
+                        HStack{
+                            Button(action: {
+                                showDatePicker = false;
+                                selectedDate = nil;
+                            }){
+                                Text("Отмена")
+                            }
+                            .padding(.leading, 12)
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            
+                            Button(action: {
+                                showDatePicker = false;
+                            }){
+                                Text("Добавить")
+                            }
+                            .padding(.trailing, 12)
+                            
+                            .frame(maxWidth: .infinity, alignment: .topTrailing)
+                            
+                        }
+                        .padding(.top, 4)
+                        
+                        DatePicker(
+                            "",
+                            selection: Binding(
+                                get: { selectedDate ?? Date() },
+                                set: { selectedDate = $0 }
+                            ),
+                            displayedComponents: .date
+                        )
+                        .datePickerStyle(.graphical)
+                        .environment(\.locale, Locale(identifier: "ru_RU"))
+                        .presentationDetents([.medium])
+                    }
+//                    .toolbar {
+//                        ToolbarItem(placement: .topBarLeading) {
+//                            Button(action :{
+//
+//                            }) {
+//                                Text("Отменить")
+//                            }
+//    //                            Button(action: {
+//    //                                showDatePicker = false;
+//    //                                selectedDate = nil;
+//    //                            }){
+//    //                                Image(systemName: "chevron.left")
+//    //                            }
+//                        }
+//                        ToolbarItem(placement: .topBarTrailing){
+//                            Button("Добавить") {
+//                                showDatePicker = false;
+//                            }
+//                        }
+//                    }
+                }
+                
+                
             }
             
         }

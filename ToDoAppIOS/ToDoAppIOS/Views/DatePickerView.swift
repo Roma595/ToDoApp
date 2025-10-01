@@ -13,20 +13,15 @@ struct DatePickerSheet: View {
     @Binding var selectedDate: Date
     
     var body: some View {
-        VStack {
-            DatePicker(
-                "",
-                selection: $selectedDate,
-                displayedComponents: .date
-            )
-            .datePickerStyle(.graphical)
-            .padding()
-            Button("Установить") {
-                dismiss()
-            }
-            .padding()
-        }
-        .presentationDetents([.medium]) // iOS 16+ для высоты popup
+        
+        DatePicker(
+            "",
+            selection: $selectedDate,
+            displayedComponents: .date
+        )
+        .datePickerStyle(.graphical)
+        
+        // iOS 16+ для высоты popup
     }
     
 }

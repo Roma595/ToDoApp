@@ -9,15 +9,15 @@ import SwiftUI
 
 struct CategoryCircleView: View {
     let category: CategoryModel
+    @State var imageName: String = "folder"
     var body: some View {
         VStack{
             Circle()
                 .fill(category.color)
                 .frame(width: 70, height: 70)
                 .overlay(
-                    Text(String(category.name.prefix(1)))
-                        .font(.title)
-                        .foregroundColor(.white)
+                    Image(systemName: imageName)
+                        .foregroundStyle(.white)
                 )
             Text(category.name)
                 .font(.caption)

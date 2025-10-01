@@ -9,27 +9,44 @@ import SwiftUI
 
 struct CategoryScrollView: View {
     
-    let categories: [CategoryModel] = [
-            CategoryModel(name: "Работа", color: .red),
-            CategoryModel(name: "Дом", color: .blue),
-            CategoryModel(name: "Учёба", color: .green),
-            CategoryModel(name: "Спорт", color: .orange),
-            CategoryModel(name: "Хобби", color: .purple)
-    ]
+    @State private var categories: [CategoryModel] = []
+    @State private var showAddCategoryView: Bool = false
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 16) {
-                ForEach(categories) { category in
+                ForEach(categories.reversed()) { category in
                     CategoryCircleView(category: category)
                 }
+                
+                Button(action:{
+                    showAddCategoryView = true
+                }){
+                    VStack{
+                        Circle()
+                            .frame(width: 70, height: 70)
+                            .foregroundStyle(.gray)
+                            .overlay(
+                                Image(systemName: "plus")
+                                    .foregroundStyle(.white)
+                            )
+                        
+                        Text("Новая").font(.caption).foregroundStyle(.black)
+                    }
+                        
+                        
+                }
+                
             }
             .padding(.horizontal)
+            
+        }
+        .sheet(isPresented: $showAddCategoryView){
+            AddCategoryView(onAddCategory: {newCategory in categories.append(newCategory)
+            showAddCategoryView = false})
+            
         }
         .frame(height: 120)
     }
 }
 
-#Preview {
-    CategoryScrollView()
-}
