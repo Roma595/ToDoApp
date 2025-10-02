@@ -14,6 +14,7 @@ struct ToDoAppIOSApp: App {
         WindowGroup {
             NavigationView {
                 ContextView()
+                    .modelContainer(for: CategoryModel.self)
             }
         }
     }

@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CategoryScrollView: View {
     
-    @State private var categories: [CategoryModel] = []
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \CategoryModel.name) private var categories: [CategoryModel]
+//    @State private var categories: [CategoryModel] = []
     @State private var showAddCategoryView: Bool = false
     @State private var selectedIndex: Int? = nil
     @State private var isSelectedCategory: Bool = false
@@ -20,30 +23,26 @@ struct CategoryScrollView: View {
                 ForEach(Array(categories.enumerated().reversed()), id: \.element.id){
                     (index, category) in
                     VStack{
-                        Circle()
-                            .fill(category.color)
-                            .frame(width: 70, height: 70)
-                            .overlay(
-                                Circle()
-                                    .stroke(selectedIndex == index ? Color.blue : Color.clear, lineWidth: 4)
-                            )
-                            .scaleEffect(selectedIndex == index ? 1.1 : 1)
-                            .animation(.spring(), value: selectedIndex)
-                            .onTapGesture {
+                        //MARK: - CategoryCircleItemView
+                        CategoryCircleItemView(
+                            category: category,
+                            isSelected: selectedIndex == index,
+                            onTap: {
                                 if (selectedIndex == index){
                                     selectedIndex = nil
                                 }
                                 else{
                                     selectedIndex = index
                                 }
-                                
                             }
+                        )
+                        //MARK: - Text
                         Text(category.name)
                             .font(.caption)
                     }
                 }
-//
                 
+                //MARK: - Button add new category
                 Button(action:{
                     showAddCategoryView = true
                 }){
@@ -67,11 +66,23 @@ struct CategoryScrollView: View {
             
         }
         .sheet(isPresented: $showAddCategoryView){
-            AddCategoryView(onAddCategory: {newCategory in categories.append(newCategory)
-            showAddCategoryView = false})
+            AddCategoryView(onAddCategory: {
+                newCategory in
+                modelContext.insert(newCategory)
+                showAddCategoryView = false
+                try_save_context()
+            })
             
         }
         .frame(height: 120)
+    }
+    
+    func try_save_context(){
+        do {
+            try modelContext.save()
+        } catch {
+            print("Ошибка сохранения: \(error)")
+        }
     }
 }
 
