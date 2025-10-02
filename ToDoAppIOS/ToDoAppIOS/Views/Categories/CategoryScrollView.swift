@@ -75,6 +75,7 @@ struct CategoryScrollView: View {
             
         }
         .frame(height: 120)
+        
     }
     
     func try_save_context(){
