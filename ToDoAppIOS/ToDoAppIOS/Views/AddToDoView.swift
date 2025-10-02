@@ -6,13 +6,22 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddToDoView: View {
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \TaskModel.id) private var tasks: [TaskModel]
+    
+    
     @State private var title: String = ""
-    @State private var note: String = ""
     @State private var selectedDate: Date? = nil
+    @State private var notificationDate: Date? = nil
+    @State private var notificationTime: Date? = nil
+    @State private var selectedCategory: CategoryModel? = nil
+    @State private var note: String = ""
+    
     @State private var showDatePicker: Bool = false
     @State private var setNotification: Bool = false
     @FocusState private var isFocusedText: Bool
@@ -164,6 +173,9 @@ struct AddToDoView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing){
                     Button("Добавить") {
+                        let newTask = TaskModel(title: title, isCompleted: false, date: selectedDate, category: selectedCategory, note: note)
+                        modelContext.insert(newTask)
+                        try_save_context()
                         dismiss()
                     }
                 }
@@ -184,6 +196,7 @@ struct AddToDoView: View {
                             
                             Button(action: {
                                 showDatePicker = false;
+                                
                             }){
                                 Text("Добавить")
                             }
@@ -206,31 +219,19 @@ struct AddToDoView: View {
                         .environment(\.locale, Locale(identifier: "ru_RU"))
                         .presentationDetents([.medium])
                     }
-//                    .toolbar {
-//                        ToolbarItem(placement: .topBarLeading) {
-//                            Button(action :{
-//
-//                            }) {
-//                                Text("Отменить")
-//                            }
-//    //                            Button(action: {
-//    //                                showDatePicker = false;
-//    //                                selectedDate = nil;
-//    //                            }){
-//    //                                Image(systemName: "chevron.left")
-//    //                            }
-//                        }
-//                        ToolbarItem(placement: .topBarTrailing){
-//                            Button("Добавить") {
-//                                showDatePicker = false;
-//                            }
-//                        }
-//                    }
+
                 }
                 
                 
             }
             
+        }
+    }
+    func try_save_context(){
+        do {
+            try modelContext.save()
+        } catch {
+            print("Ошибка сохранения: \(error)")
         }
     }
 }

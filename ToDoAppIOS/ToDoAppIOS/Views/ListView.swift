@@ -6,30 +6,37 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ListView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \TaskModel.completedValue) private var tasks: [TaskModel]
     
     @State var showAddView: Bool = false
     
     var body: some View {
         NavigationStack{
-            List{
-                
-            }
-            .navigationTitle(Text("Список"))
-            .toolbar{
-                ToolbarItem(placement: .navigationBarTrailing){
-                    Button{
-                        showAddView = true
-                    }label: {
-                        Image(systemName:"plus")
+            ScrollView{
+                VStack{
+                    ForEach(tasks){ task in
+                        TaskItemView(task: task)
                     }
                 }
+                .navigationTitle(Text("Список"))
+                .toolbar{
+                    ToolbarItem(placement: .navigationBarTrailing){
+                        Button{
+                            showAddView = true
+                        }label: {
+                            Image(systemName:"plus")
+                        }
+                    }
+                }
+                .sheet(isPresented: $showAddView) {
+                    AddToDoView()
+                }
+                    
             }
-            .sheet(isPresented: $showAddView) {
-                AddToDoView()
-            }
-                
         }
     }
 }

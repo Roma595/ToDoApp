@@ -14,7 +14,7 @@ struct ToDoAppIOSApp: App {
         WindowGroup {
             NavigationView {
                 ContextView()
-                    .modelContainer(for: CategoryModel.self)
+                    .modelContainer(for: [CategoryModel.self, TaskModel.self])
             }
         }
     }
