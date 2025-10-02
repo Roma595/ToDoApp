@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CategoryCircleView: View {
-    let category: CategoryModel
+    @State var category: CategoryModel
     @State var imageName: String = "folder"
     var body: some View {
         VStack{

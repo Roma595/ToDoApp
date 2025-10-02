@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct CategoryModel: Identifiable {
+struct CategoryModel: Identifiable{
     let id = UUID()
     let name: String
     let color: Color
