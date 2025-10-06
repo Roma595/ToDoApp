@@ -1,5 +1,5 @@
 //
-//  AddToDoView.swift
+//  AddTaskView.swift
 //  ToDoAppIOS
 //
 //  Created by Рома Котков on 17.09.2025.
@@ -23,45 +23,21 @@ struct AddTaskView: View {
     @State private var selectedCategory: CategoryModel? = nil
     @State private var note: String = ""
     
-    @State private var showDatePicker: Bool = false
-    @State private var setNotification: Bool = false
     @FocusState private var isFocusedText: Bool
-    
-    private var dateFormatter: DateFormatter {
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "ru_RU")
-            formatter.dateStyle = .long
-            return formatter
-    }
     
     var body: some View {
         NavigationStack {
             ScrollView{
                 VStack(alignment: .leading, spacing: 15){
                     // MARK: - Title
-                    VStack{
-                        AddTaskFieldHeaderView(imageName: nil, headerName: "Заголовок")
-                        TextField("", text: $title)
-                            .focused($isFocusedText)
-                            .padding(10)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                            )
-                            .padding(.horizontal)
-                            
-                    }
-                    .toolbar{
-                        ToolbarItemGroup(placement: .keyboard){
-                            Spacer()
-                            Button("Готово"){
-                                isFocusedText = false
-                                
-                            }
-                        
-                        }
-                    }
-                    
+                    TextField("Название задачи", text: $title)
+                        .font(.title2)
+                        .focused($isFocusedText)
+                        .submitLabel(.done)
+                        .padding(10)
+                        .onSubmit {isFocusedText.toggle()}
+
+                
                     // MARK: - Date Calendar
                     VStack(alignment: .leading, spacing: 15){
                         AddTaskFieldHeaderView(imageName: "calendar", headerName: "Дата")
@@ -69,11 +45,12 @@ struct AddTaskView: View {
                         if let date = selectedDate {
                             Text(dateFormatter.string(from: date))
                                             .foregroundColor(.blue)
-                                            .onTapGesture { showDatePicker = true }
+                                            .onTapGesture { activeSheet = .date}
                                             .frame(maxWidth: .infinity, alignment: .center)
                                             .padding(10)
                         } else {
-                            Button(action: {activeSheet = .date}) {
+                            Button(action: {activeSheet = .date
+                            selectedDate = Date()}) {
                                 HStack {
                                     Image(systemName: "plus")
                                     Text("Добавить дату")
@@ -97,17 +74,13 @@ struct AddTaskView: View {
                             .foregroundColor(.blue)
                             .frame(maxWidth: .infinity, alignment: .center)
                         }.padding(.vertical, 10)
-                        
-                        
-                        
-                        
                     }
                     
                     //MARK: - Category Scroll
                     VStack(alignment: .leading, spacing: 15 ){
                         AddTaskFieldHeaderView(imageName: "paintbrush", headerName: "Категория")
                         CategoryScrollView(activeSheet: $activeSheet)
-                    
+                            
                     }
                     
                     //MARK: - Note
@@ -122,42 +95,58 @@ struct AddTaskView: View {
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                             )
+                            .onSubmit {isFocusedText.toggle()}
                             .clipped()
                             .padding()
                     }
                 }
-                
             }
+            //MARK: - Toolbar
             .padding(12)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Отмена") {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
                         dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                            .frame(width: 30, height: 30)
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing){
-                    Button("Добавить") {
-                        let newTask = TaskModel(title: title, isCompleted: false, date: selectedDate, category: selectedCategory, note: note)
-                        modelContext.insert(newTask)
-                        try_save_context()
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        add_new_task()
                         dismiss()
+                    }) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                            .frame(width: 30, height: 30)
                     }
                 }
             }
-            //MARK: -Sheet
+            //MARK: - Sheet
             .sheet(item: $activeSheet) {sheet in
                 switch sheet {
                 case .date:
-                    DatePickerView(showDatePicker: $showDatePicker,  selectedDate: $selectedDate)
+                    DatePickerView(selectedDate: $selectedDate)
+                        .presentationDetents([.medium])
+                        .interactiveDismissDisabled(true)
                 case .notification:
                     Text("Notification")
+                        .presentationDetents([.medium])
+                        .interactiveDismissDisabled(true)
                 case .category:
-                    Text("Category")
+                    AddCategoryView()
+                        .presentationDetents([.medium])
+                        .interactiveDismissDisabled(true)
                 }
             }
-            
         }
     }
+    
+    
     func try_save_context(){
         do {
             try modelContext.save()
@@ -165,6 +154,20 @@ struct AddTaskView: View {
             print("Ошибка сохранения: \(error)")
         }
     }
+    
+    func add_new_task(){
+        let newTask = TaskModel(title: title, isCompleted: false, date: selectedDate, category: selectedCategory, note: note)
+        modelContext.insert(newTask)
+        try_save_context()
+    }
+    
+    private var dateFormatter: DateFormatter {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_RU")
+            formatter.dateStyle = .long
+            return formatter
+    }
+    
 }
 
 // MARK: - Preview

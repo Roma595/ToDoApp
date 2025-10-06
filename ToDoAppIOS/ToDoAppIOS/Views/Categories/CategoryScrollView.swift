@@ -26,6 +26,7 @@ struct CategoryScrollView: View {
                             isSelected: selectedIndex == index,
                             onTap: {tap_on_item(index: index)}
                         )
+                        .padding(.vertical, 6)
                         Text(category.name)
                             .font(.caption)
                     }
@@ -45,14 +46,6 @@ struct CategoryScrollView: View {
                 }
             }
             .padding(.horizontal)
-        }
-    }
-    
-    func try_save_context(){
-        do {
-            try modelContext.save()
-        } catch {
-            print("Ошибка сохранения: \(error)")
         }
     }
     

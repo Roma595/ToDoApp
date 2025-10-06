@@ -20,6 +20,7 @@ struct ListView: View {
             }
             .sheet(isPresented: $showAddView) {
                 AddTaskView()
+                    .interactiveDismissDisabled(true)
             }
         }
     }

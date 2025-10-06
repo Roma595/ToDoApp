@@ -21,13 +21,30 @@ struct TaskListView: View {
                 ForEach(activeTasks) { task in
                     TaskItemView(task: task)
                 }
+                .onDelete{ indexSet in deleteActiveTasks(at: indexSet)}
             }
                         
             Section(header: Text("Выполненные задачи")) {
                 ForEach(completedTasks) { task in
                     TaskItemView(task: task)
                 }
+                .onDelete { indexSet in deleteCompletedTasks(at: indexSet)}
             }
+        }
+    }
+    
+    func deleteActiveTasks(at offsets: IndexSet) {
+        for index in offsets {
+            let task = activeTasks[index]
+            modelContext.delete(task)
+        }
+    }
+
+    // Удаление завершённых задач
+    func deleteCompletedTasks(at offsets: IndexSet) {
+        for index in offsets {
+            let task = completedTasks[index]
+            modelContext.delete(task)
         }
     }
 }

@@ -6,8 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddCategoryView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \CategoryModel.name) private var categories: [CategoryModel]
+    
     @State private var categoryName:String = ""
     @State private var selectedColor:Color = .black
     
@@ -21,20 +25,10 @@ struct AddCategoryView: View {
                 .font(.title2)
                 .padding(.horizontal)
             
-            Text("Иконка")
-                .font(.title2)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-            
-            Circle()
-                .fill(selectedColor)
-                .frame(width: 100, height: 100)
-                
-                
-            
             Button(action: {
                 let newCategory = CategoryModel(name: categoryName, color: selectedColor)
-                onAddCategory(newCategory)
+                modelContext.insert(newCategory)
+                try_save_context()
             }) {
                 Rectangle()
                     .fill(.white)
@@ -50,10 +44,16 @@ struct AddCategoryView: View {
         }
         
     }
+    func try_save_context(){
+        do {
+            try modelContext.save()
+        } catch {
+            print("Ошибка сохранения: \(error)")
+        }
+    }
     
-    var onAddCategory: (CategoryModel) -> Void
 }
 
 #Preview {
-    AddCategoryView(onAddCategory: { _ in })
+    AddCategoryView()
 }

@@ -10,7 +10,6 @@ import SwiftUI
 struct DatePickerView: View {
     
     @Environment(\.dismiss) var dismiss
-    @Binding var showDatePicker: Bool
     @Binding var selectedDate: Date?
     
     var body: some View {
@@ -18,21 +17,20 @@ struct DatePickerView: View {
             VStack{
                 HStack{
                     Button(action: {
-                        showDatePicker = false;
                         selectedDate = nil;
+                        dismiss()
                     }){
                         Text("Отмена")
                     }
-                    .padding(.leading, 12)
+                    .padding(.leading, 15)
                     .frame(maxWidth: .infinity, alignment: .topLeading)
                     
                     Button(action: {
-                        showDatePicker = false;
-                        
+                        dismiss()
                     }){
                         Text("Добавить")
                     }
-                    .padding(.trailing, 12)
+                    .padding(.trailing, 15)
                     
                     .frame(maxWidth: .infinity, alignment: .topTrailing)
                     
@@ -49,12 +47,10 @@ struct DatePickerView: View {
                 )
                 .datePickerStyle(.graphical)
                 .environment(\.locale, Locale(identifier: "ru_RU"))
-                .presentationDetents([.medium])
             }
 
         }
     }
     
 }
-
 
