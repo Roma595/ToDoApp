@@ -107,7 +107,10 @@ struct AddToDoView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
                         }
-                        Button (action: {setNotification = true}){
+                        Button (action: {
+                            setNotification = true
+                            NotificationManager.shared.schedule(title: "test notification", body: "Тестируем напоминания гы гы", date: Date(timeIntervalSinceNow: 10))
+                        }){
                             HStack {
                                 Image(systemName: "plus")
                                 Text("Добавить напоминание")
