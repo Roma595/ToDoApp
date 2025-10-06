@@ -18,12 +18,22 @@ struct TaskItemView: View {
                     task.isCompleted.toggle()
                 } }
             VStack(alignment: .leading) {
-                Text(task.title)
-                    .font(.body)
-                    .bold()
-                Text(task.createdDate, style: .date)
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                if(task.category != nil){
+                    Text(task.category!.name)
+                        .font(.body)
+                        .bold()
+                }
+                else{
+                    Text(task.title)
+                        .font(.body)
+                        .bold()
+                }
+                
+                if task.date != nil {
+                    Text(task.date!, style: .date)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
             }
             Spacer()
         }

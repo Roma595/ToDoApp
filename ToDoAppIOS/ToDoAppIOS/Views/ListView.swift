@@ -14,7 +14,7 @@ struct ListView: View {
     var body: some View {
         NavigationStack{
             TaskListView()
-            .navigationTitle(Text("Список"))
+            .navigationTitle(Text("Список задач"))
             .toolbar{
                 ListViewToolbar(showAddView: $showAddView)
             }

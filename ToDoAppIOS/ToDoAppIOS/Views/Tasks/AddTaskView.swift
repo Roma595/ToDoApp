@@ -20,7 +20,7 @@ struct AddTaskView: View {
     @State private var selectedDate: Date? = nil
     @State private var notificationDate: Date? = nil
     @State private var notificationTime: Date? = nil
-    @State private var selectedCategory: CategoryModel? = nil
+    @State private var taskCategory: CategoryModel? = nil
     @State private var note: String = ""
     
     @FocusState private var isFocusedText: Bool
@@ -34,8 +34,8 @@ struct AddTaskView: View {
                         .font(.title2)
                         .focused($isFocusedText)
                         .submitLabel(.done)
-                        .padding(10)
                         .onSubmit {isFocusedText.toggle()}
+                        .padding(10)
 
                 
                     // MARK: - Date Calendar
@@ -79,6 +79,7 @@ struct AddTaskView: View {
                     //MARK: - Category Scroll
                     VStack(alignment: .leading, spacing: 15 ){
                         AddTaskFieldHeaderView(imageName: "paintbrush", headerName: "Категория")
+                    
                         CategoryScrollView(activeSheet: $activeSheet)
                             
                     }
@@ -86,18 +87,16 @@ struct AddTaskView: View {
                     //MARK: - Note
                     VStack(alignment: .leading, spacing: 15 ){
                         AddTaskFieldHeaderView(imageName: "pencil", headerName: "Заметка")
-                
+                        
+                        
                         TextEditor(text: $note)
-                            .focused($isFocusedText)
-                            .padding(.top, 4)
                             .frame(minHeight: 150)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                             )
-                            .onSubmit {isFocusedText.toggle()}
-                            .clipped()
-                            .padding()
+                            .focused($isFocusedText)
+                            .padding(15)
                     }
                 }
             }
@@ -156,7 +155,7 @@ struct AddTaskView: View {
     }
     
     func add_new_task(){
-        let newTask = TaskModel(title: title, isCompleted: false, date: selectedDate, category: selectedCategory, note: note)
+        let newTask = TaskModel(title: title, isCompleted: false, date: selectedDate, category: taskCategory, note: note)
         modelContext.insert(newTask)
         try_save_context()
     }
