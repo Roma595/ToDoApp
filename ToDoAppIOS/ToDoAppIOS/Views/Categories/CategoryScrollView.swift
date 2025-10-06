@@ -55,7 +55,7 @@ struct CategoryScrollView: View {
                                     .foregroundStyle(.white)
                             )
                         
-                        Text("Новая").font(.caption).foregroundStyle(.black)
+                        Text("Новая").font(.caption)
                     }
                         
                         

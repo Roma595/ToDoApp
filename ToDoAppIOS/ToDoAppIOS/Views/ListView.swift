@@ -10,32 +10,46 @@ import SwiftData
 
 struct ListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \TaskModel.completedValue) private var tasks: [TaskModel]
+    @Query(sort: \TaskModel.createdDate, order: .reverse) private var tasks: [TaskModel]
     
     @State var showAddView: Bool = false
     
+    var activeTasks: [TaskModel] {
+        tasks.filter { !$0.isCompleted }
+    }
+
+    var completedTasks: [TaskModel] {
+        tasks.filter { $0.isCompleted }
+    }
+    
     var body: some View {
         NavigationStack{
-            ScrollView{
-                VStack{
-                    ForEach(tasks){ task in
+            List{
+                Section(header: Text("Активные задачи")) {
+                    ForEach(activeTasks) { task in
                         TaskItemView(task: task)
                     }
                 }
-                .navigationTitle(Text("Список"))
-                .toolbar{
-                    ToolbarItem(placement: .navigationBarTrailing){
-                        Button{
-                            showAddView = true
-                        }label: {
-                            Image(systemName:"plus")
-                        }
+                            
+                Section(header: Text("Выполненные задачи")) {
+                    ForEach(completedTasks) { task in
+                        TaskItemView(task: task)
                     }
                 }
-                .sheet(isPresented: $showAddView) {
-                    AddToDoView()
+            }
+            .animation(.default, value: tasks)
+            .navigationTitle(Text("Список"))
+            .toolbar{
+                ToolbarItem(placement: .navigationBarTrailing){
+                    Button{
+                        showAddView = true
+                    }label: {
+                        Image(systemName:"plus")
+                    }
                 }
-                    
+            }
+            .sheet(isPresented: $showAddView) {
+                AddToDoView()
             }
         }
     }

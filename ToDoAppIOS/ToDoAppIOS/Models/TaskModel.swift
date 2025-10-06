@@ -17,6 +17,8 @@ class TaskModel: Identifiable {
     //var notification
     var category: CategoryModel?
     var note: String?
+    
+    var createdDate: Date
     var completedValue:Int
     
     init(title: String, isCompleted: Bool, date: Date? = nil, category: CategoryModel? = nil, note: String? = nil) {
@@ -26,6 +28,8 @@ class TaskModel: Identifiable {
         self.date = date
         self.category = category
         self.note = note
+        self.createdDate = Date()
         self.completedValue = isCompleted ? 1 : 0
+        
     }
 }
