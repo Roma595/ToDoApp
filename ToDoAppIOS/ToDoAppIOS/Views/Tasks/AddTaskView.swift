@@ -8,12 +8,13 @@
 import SwiftUI
 import SwiftData
 
-struct AddToDoView: View {
+struct AddTaskView: View {
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TaskModel.id) private var tasks: [TaskModel]
     
+    @State private var activeSheet: AddToDoSheet?
     
     @State private var title: String = ""
     @State private var selectedDate: Date? = nil
@@ -39,10 +40,7 @@ struct AddToDoView: View {
                 VStack(alignment: .leading, spacing: 15){
                     // MARK: - Title
                     VStack{
-                        Text("Заголовок")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        AddTaskFieldHeaderView(imageName: nil, headerName: "Заголовок")
                         TextField("", text: $title)
                             .focused($isFocusedText)
                             .padding(10)
@@ -66,18 +64,8 @@ struct AddToDoView: View {
                     
                     // MARK: - Date Calendar
                     VStack(alignment: .leading, spacing: 15){
-                        HStack{
-                            Image(systemName: "calendar")
-                                .foregroundStyle(.secondary)
-                            Text("Дата")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            
-                            Spacer()
-                                
-                        }
-                        
+                        AddTaskFieldHeaderView(imageName: "calendar", headerName: "Дата")
+            
                         if let date = selectedDate {
                             Text(dateFormatter.string(from: date))
                                             .foregroundColor(.blue)
@@ -85,8 +73,7 @@ struct AddToDoView: View {
                                             .frame(maxWidth: .infinity, alignment: .center)
                                             .padding(10)
                         } else {
-                            Button(action: { showDatePicker = true;
-                                }) {
+                            Button(action: {activeSheet = .date}) {
                                 HStack {
                                     Image(systemName: "plus")
                                     Text("Добавить дату")
@@ -98,17 +85,9 @@ struct AddToDoView: View {
                     }
                     //MARK: - Notification
                     VStack(alignment: .leading, spacing: 15 ){
-                        HStack{
-                            Image(systemName: "bell")
-                                .foregroundStyle(.secondary)
-                            Text("Напоминание")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Spacer()
-                        }
+                        AddTaskFieldHeaderView(imageName: "bell", headerName: "Напоминание")
                         Button (action: {
-                            setNotification = true
+                            activeSheet = .notification
                             NotificationManager.shared.schedule(title: "test notification", body: "Тестируем напоминания гы гы", date: Date(timeIntervalSinceNow: 10))
                         }){
                             HStack {
@@ -123,31 +102,17 @@ struct AddToDoView: View {
                         
                         
                     }
+                    
                     //MARK: - Category Scroll
                     VStack(alignment: .leading, spacing: 15 ){
-                        HStack{
-                            Image(systemName: "paintbrush").foregroundStyle(.secondary)
-                            Text("Категория")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            
-                        }
-                        
-                        CategoryScrollView()
+                        AddTaskFieldHeaderView(imageName: "paintbrush", headerName: "Категория")
+                        CategoryScrollView(activeSheet: $activeSheet)
                     
                     }
-                    //MARK: - Text
+                    
+                    //MARK: - Note
                     VStack(alignment: .leading, spacing: 15 ){
-                        HStack{
-                            Image(systemName: "pencil")
-                                .foregroundStyle(.secondary)
-                            Text("Заметка")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Spacer()
-                        }
+                        AddTaskFieldHeaderView(imageName: "pencil", headerName: "Заметка")
                 
                         TextEditor(text: $note)
                             .focused($isFocusedText)
@@ -160,10 +125,6 @@ struct AddToDoView: View {
                             .clipped()
                             .padding()
                     }
-                    
-                    //MARK: - //
-                    
-                    
                 }
                 
             }
@@ -183,49 +144,16 @@ struct AddToDoView: View {
                     }
                 }
             }
-            //MARK: -DataPicker
-            .sheet(isPresented: $showDatePicker) {
-                NavigationStack{
-                    VStack{
-                        HStack{
-                            Button(action: {
-                                showDatePicker = false;
-                                selectedDate = nil;
-                            }){
-                                Text("Отмена")
-                            }
-                            .padding(.leading, 12)
-                            .frame(maxWidth: .infinity, alignment: .topLeading)
-                            
-                            Button(action: {
-                                showDatePicker = false;
-                                
-                            }){
-                                Text("Добавить")
-                            }
-                            .padding(.trailing, 12)
-                            
-                            .frame(maxWidth: .infinity, alignment: .topTrailing)
-                            
-                        }
-                        .padding(.top, 4)
-                        
-                        DatePicker(
-                            "",
-                            selection: Binding(
-                                get: { selectedDate ?? Date() },
-                                set: { selectedDate = $0 }
-                            ),
-                            displayedComponents: .date
-                        )
-                        .datePickerStyle(.graphical)
-                        .environment(\.locale, Locale(identifier: "ru_RU"))
-                        .presentationDetents([.medium])
-                    }
-
+            //MARK: -Sheet
+            .sheet(item: $activeSheet) {sheet in
+                switch sheet {
+                case .date:
+                    DatePickerView(showDatePicker: $showDatePicker,  selectedDate: $selectedDate)
+                case .notification:
+                    Text("Notification")
+                case .category:
+                    Text("Category")
                 }
-                
-                
             }
             
         }
@@ -241,5 +169,5 @@ struct AddToDoView: View {
 
 // MARK: - Preview
 #Preview {
-    AddToDoView()
+    AddTaskView()
 }
