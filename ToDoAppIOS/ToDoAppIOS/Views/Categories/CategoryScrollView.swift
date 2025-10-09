@@ -14,6 +14,7 @@ struct CategoryScrollView: View {
     @Query(sort: \CategoryModel.name) private var categories: [CategoryModel]
     
     @Binding var activeSheet: AddToDoSheet?
+    @Binding var selectedCategory: CategoryModel?
     @State private var selectedIndex: Int? = nil
     
     var body: some View {
@@ -52,9 +53,12 @@ struct CategoryScrollView: View {
     func tap_on_item(index: Int){
         if (selectedIndex == index){
             selectedIndex = nil
+            selectedCategory = nil
         }
         else{
             selectedIndex = index
+            let reversedCategories = Array(categories.enumerated().reversed())
+            selectedCategory = reversedCategories[index].element
         }
     }
 }

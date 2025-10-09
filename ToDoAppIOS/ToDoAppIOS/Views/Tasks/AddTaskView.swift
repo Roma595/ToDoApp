@@ -16,12 +16,12 @@ struct AddTaskView: View {
     
     @State private var activeSheet: AddToDoSheet?
     
-    @State private var title: String = ""
+    @State private var taskName: String = ""
     @State private var selectedDate: Date? = nil
     @State private var notificationDate: Date? = nil
     @State private var notificationTime: Date? = nil
     @State private var taskCategory: CategoryModel? = nil
-    @State private var note: String = ""
+    @State private var taskNote: String = ""
     
     @FocusState private var isFocusedText: Bool
     
@@ -29,8 +29,8 @@ struct AddTaskView: View {
         NavigationStack {
             ScrollView{
                 VStack(alignment: .leading, spacing: 15){
-                    // MARK: - Title
-                    TextField("Название задачи", text: $title)
+                    // MARK: - taskName
+                    TextField("Название задачи", text: $taskName)
                         .font(.title2)
                         .focused($isFocusedText)
                         .submitLabel(.done)
@@ -80,7 +80,7 @@ struct AddTaskView: View {
                     VStack(alignment: .leading, spacing: 15 ){
                         AddTaskFieldHeaderView(imageName: "paintbrush", headerName: "Категория")
                     
-                        CategoryScrollView(activeSheet: $activeSheet)
+                        CategoryScrollView(activeSheet: $activeSheet, selectedCategory: $taskCategory)
                             
                     }
                     
@@ -89,7 +89,7 @@ struct AddTaskView: View {
                         AddTaskFieldHeaderView(imageName: "pencil", headerName: "Заметка")
                         
                         
-                        TextEditor(text: $note)
+                        TextEditor(text: $taskNote)
                             .frame(minHeight: 150)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
@@ -155,7 +155,7 @@ struct AddTaskView: View {
     }
     
     func add_new_task(){
-        let newTask = TaskModel(title: title, isCompleted: false, date: selectedDate, category: taskCategory, note: note)
+        let newTask = TaskModel(name: taskName, isCompleted: false, date: selectedDate, category: taskCategory, note: taskNote)
         modelContext.insert(newTask)
         try_save_context()
     }

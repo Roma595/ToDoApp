@@ -10,6 +10,7 @@ import SwiftData
 
 struct AddCategoryView: View {
     
+    @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \CategoryModel.name) private var categories: [CategoryModel]
     
@@ -31,6 +32,7 @@ struct AddCategoryView: View {
                     let newCategory = CategoryModel(name: categoryName, color: selectedColor)
                     modelContext.insert(newCategory)
                     try_save_context()
+                    dismiss()
                 }) {
                     Rectangle()
                         .fill(.white)

@@ -11,11 +11,19 @@ struct ListViewToolbar: ToolbarContent {
     @Binding var showAddView: Bool
 
     var body: some ToolbarContent {
+        
         ToolbarItem(placement: .navigationBarTrailing) {
             Button {
                 showAddView = true
             } label: {
                 Image(systemName: "plus")
+            }
+        }
+        ToolbarItem(placement: .navigationBarTrailing) {
+            Button {
+                
+            } label: {
+                Image(systemName: "ellipsis")
             }
         }
     }

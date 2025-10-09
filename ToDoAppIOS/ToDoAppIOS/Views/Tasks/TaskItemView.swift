@@ -18,16 +18,9 @@ struct TaskItemView: View {
                     task.isCompleted.toggle()
                 } }
             VStack(alignment: .leading) {
-                if(task.category != nil){
-                    Text(task.category!.name)
-                        .font(.body)
-                        .bold()
-                }
-                else{
-                    Text(task.title)
-                        .font(.body)
-                        .bold()
-                }
+                Text(task.name)
+                    .font(.body)
+                    .bold()
                 
                 if task.date != nil {
                     Text(task.date!, style: .date)
@@ -43,5 +36,5 @@ struct TaskItemView: View {
 
 
 #Preview {
-    TaskItemView(task: TaskModel(title: "Test", isCompleted: false, date: nil, category: nil, note: "Test more"))
+    TaskItemView(task: TaskModel(name: "Test", isCompleted: false, date: nil, category: nil, note: "Test more"))
 }

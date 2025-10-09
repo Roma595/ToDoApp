@@ -11,25 +11,21 @@ import SwiftData
 @Model
 class TaskModel: Identifiable {
     @Attribute(.unique) var id: String = UUID().uuidString
-    var title: String
+    var name: String
     var isCompleted: Bool
     var date: Date?
-    //var notification
     var category: CategoryModel?
     var note: String?
     
     var createdDate: Date
-    var completedValue:Int
     
-    init(title: String, isCompleted: Bool, date: Date? = nil, category: CategoryModel? = nil, note: String? = nil) {
+    init(name: String, isCompleted: Bool, date: Date? = nil, category: CategoryModel? = nil, note: String? = nil) {
         self.id = UUID().uuidString
-        self.title = title
+        self.name = name
         self.isCompleted = isCompleted
         self.date = date
         self.category = category
         self.note = note
         self.createdDate = Date()
-        self.completedValue = isCompleted ? 1 : 0
-        
     }
 }
