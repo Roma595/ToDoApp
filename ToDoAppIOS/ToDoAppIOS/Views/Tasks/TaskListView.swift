@@ -8,10 +8,21 @@
 import SwiftUI
 import SwiftData
 
+enum SortType: String, CaseIterable, Identifiable {
+    case name = "По имени"
+    case dueDate = "По дате"
+    case createdDate = "По дате создания"
+    
+    var id: String { self.rawValue }
+}
+
 struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \TaskModel.createdDate, order: .reverse) private var tasks: [TaskModel]
+    @Query(sort: \TaskModel.name, order: .reverse) private var tasks: [TaskModel]
+    
     @State private var selectedCategory: String = "Все"
+    @State private var sortType: SortType = .name
+    @State private var ascending: Bool = true
     
     var categories: [String] {
         let raw = tasks.compactMap { $0.category?.name }
@@ -23,27 +34,45 @@ struct TaskListView: View {
         tasks.filter { $0.category?.name == selectedCategory }
     }
     
-    var activeTasks: [TaskModel] {filteredTasks.filter { !$0.isCompleted }}
-    var completedTasks: [TaskModel] {filteredTasks.filter { $0.isCompleted }}
+    var sortedTasks: [TaskModel] {
+            switch sortType {
+            case .name:
+                return filteredTasks.sorted { $0.name < $1.name }
+            case .dueDate:
+                return filteredTasks.sorted { $0.date ?? Date(timeIntervalSinceNow: .infinity) < $1.date ?? Date(timeIntervalSinceNow: .infinity)}
+            case .createdDate:
+                return filteredTasks.sorted { $0.createdDate > $1.createdDate }
+            }
+    }
+    
+    var activeTasks: [TaskModel] {sortedTasks.filter { !$0.isCompleted }}
+    var completedTasks: [TaskModel] {sortedTasks.filter { $0.isCompleted }}
     
     var body: some View {
         
         VStack{
-            Picker("Категория",selection: $selectedCategory) {
-                ForEach(categories, id: \.self) { option in
-                    Text(option)
+            HStack{
+                Picker("Категория",selection: $selectedCategory) {
+                    ForEach(categories, id: \.self) { option in
+                        Text(option)
+                    }
                 }
+                .padding(.horizontal)
+                .pickerStyle(.menu)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Picker(selection: $sortType, label: HStack {
+                    Image(systemName: "chevron.down")
+                    Text("Сортировка")
+                }) {
+                    ForEach(SortType.allCases) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                }
+                .padding(.horizontal)
+                .pickerStyle(.menu)
             }
-            .padding(.horizontal)
-            .pickerStyle(.menu)
-            .frame(maxWidth: .infinity, alignment: .leading)
-//            Picker("Категория", selection: $selectedCategory) {
-//                ForEach(categories, id: \.self) { cat in
-//                    Text(cat)
-//                }
-//            }
-//            .pickerStyle(MenuPickerStyle())
-//            .padding()
+            
             List{
                 Section(header: Text("Активные задачи")) {
                     ForEach(activeTasks) { task in
