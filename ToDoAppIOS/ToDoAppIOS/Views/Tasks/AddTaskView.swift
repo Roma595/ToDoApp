@@ -133,7 +133,7 @@ struct AddTaskView: View {
                         .presentationDetents([.medium])
                         .interactiveDismissDisabled(true)
                 case .notification:
-                    Text("Notification")
+                    AddNotificationView()
                         .presentationDetents([.medium])
                         .interactiveDismissDisabled(true)
                 case .category:
