@@ -6,22 +6,59 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- RecyclerView для списка задач -->
-
     <!-- Кнопка "Создать задачу" -->
 
+    <!-- ScrollView для обоих списков -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/createTaskButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="Создать задачу" />
+        android:layout_marginBottom="40dp"
+        android:text="Создать задачу"
+        android:textSize="20sp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_height="match_parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- АКТИВНЫЕ ЗАДАЧИ -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Активные задачи"
+                android:textSize="20sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="8dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/activeTasksRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <!-- ВЫПОЛНЕННЫЕ ЗАДАЧИ -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Выполненные задачи"
+                android:textSize="20sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="24dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/completedTasksRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

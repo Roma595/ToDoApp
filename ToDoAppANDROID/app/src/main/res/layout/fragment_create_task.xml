@@ -8,6 +8,21 @@
     android:orientation="vertical">
 
     <!-- TopAppBar с двумя иконками -->
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="393dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Дата"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/taskTitleEditText" />
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -25,20 +40,50 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Заголовок -->
+
+    <!-- Дата -->
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/taskTitleEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Название задачи"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+        tools:layout_editor_absoluteX="0dp"
+        tools:text="Название задачи"></com.google.android.material.textfield.TextInputEditText>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:boxBackgroundMode="outline">
+        android:hint="Дата"
+        app:boxBackgroundMode="outline"
+        android:layout_marginBottom="16dp">
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/taskDateEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="Добавить дату"
+        android:inputType="none"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        tools:layout_editor_absoluteX="0dp" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        app:boxBackgroundMode="outline">
+        android:hint="Описание"
+        app:boxBackgroundMode="outline"
+        android:layout_marginBottom="16dp">
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -46,23 +91,41 @@
         android:id="@+id/taskDescriptionEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Описание"
+        android:layout_marginTop="16dp"
+        android:hint="Заметка"
         android:inputType="textMultiLine"
-        android:lines="6"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/taskTitleEditText"
-        app:layout_constraintVertical_bias="0.086"
-        tools:layout_editor_absoluteX="0dp" />
+        android:lines="3"
+        app:layout_constraintTop_toBottomOf="@+id/taskDateEditText"
+        tools:layout_editor_absoluteX="0dp"
+        tools:text="Описание задачи" />
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/taskTitleEditText"
+    <!-- Переключатель напоминания -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/taskReminder"
+        android:layout_width="395dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="sans-serif"
+        android:text="Добавить напоминание"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.52"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/taskDescriptionEditText" />
+
+    <!-- Карусель категорий -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/categoriesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:hint="Название задачи"
-        android:inputType="text"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
-        tools:layout_editor_absoluteX="0dp" />
-
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/taskReminder"
+        tools:listitem="@layout/item_category" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

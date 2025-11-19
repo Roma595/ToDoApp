@@ -50,4 +50,6 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.3.4")
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation ("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation("com.github.yukuku:ambilwarna:2.0.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 }
