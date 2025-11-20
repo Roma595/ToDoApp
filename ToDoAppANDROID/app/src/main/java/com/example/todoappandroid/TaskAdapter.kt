@@ -1,17 +1,16 @@
 package com.example.todoappandroid
-import com.google.android.material.checkbox.MaterialCheckBox
+
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.DiffUtil
+import com.google.android.material.checkbox.MaterialCheckBox
 
 class TaskAdapter(
-    private val onTaskClick: (Task) -> Unit,
     private val onTaskToggle: (Task) -> Unit
 ) : ListAdapter<Task, TaskAdapter.TaskViewHolder>(TaskDiffCallback()) {
 
@@ -26,27 +25,29 @@ class TaskAdapter(
     }
 
     inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val checkBox: MaterialCheckBox = itemView.findViewById(R.id.taskCheckBox)  // ← изменено
+        private val checkBox: MaterialCheckBox = itemView.findViewById(R.id.taskCheckBox)
         private val titleTextView: TextView = itemView.findViewById(R.id.taskTitle)
         private val dateTextView: TextView = itemView.findViewById(R.id.taskDate)
 
         fun bind(task: Task) {
             titleTextView.text = task.title
 
-            // Убираем слушатель, чтобы избежать срабатываний при переиспользовании ViewHolder
+            // ⭐ КЛЮЧЕВОЙ МОМЕНТ: убираем старый слушатель ДО изменения isChecked
             checkBox.setOnCheckedChangeListener(null)
             checkBox.isChecked = task.isCompleted
 
-            // Меняем стиль текста
+            // Визуальные эффекты для выполненной задачи
             if (task.isCompleted) {
                 titleTextView.paintFlags = titleTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 titleTextView.alpha = 0.5f
+                dateTextView.alpha = 0.5f
             } else {
                 titleTextView.paintFlags = titleTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 titleTextView.alpha = 1f
+                dateTextView.alpha = 1f
             }
 
-            // Дата задачи
+            // Отображаем дату если есть
             if (task.date != null) {
                 dateTextView.text = task.date
                 dateTextView.visibility = View.VISIBLE
@@ -54,14 +55,21 @@ class TaskAdapter(
                 dateTextView.visibility = View.GONE
             }
 
-            // Теперь назначаем слушатель заново
+            // ⭐ КЛЮЧЕВОЙ МОМЕНТ: назначаем слушатель ПОСЛЕ всех изменений
             checkBox.setOnCheckedChangeListener { _, isChecked ->
-                onTaskToggle(task.copy(isCompleted = isChecked))
+                if (isChecked != task.isCompleted) {  // Проверяем, что действительно изменилось
+                    onTaskToggle(task.copy(isCompleted = isChecked))
+                }
             }
         }
-
     }
-
+    fun deleteTask(position: Int) {
+        val currentList = currentList.toMutableList()
+        if (position >= 0 && position < currentList.size) {
+            currentList.removeAt(position)
+            submitList(currentList)
+        }
+    }
 }
 
 class TaskDiffCallback : DiffUtil.ItemCallback<Task>() {
