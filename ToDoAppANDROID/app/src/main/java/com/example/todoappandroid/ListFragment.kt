@@ -1,6 +1,6 @@
 package com.example.todoappandroid
 
-import TaskViewModel
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+
 
 class ListFragment : Fragment() {
 
@@ -26,6 +27,9 @@ class ListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        viewModel.categories.observe(this) {
+            // ничего не делай, просто нужна подписка для запуска Room
+        }
         return inflater.inflate(R.layout.fragment_list, container, false)
     }
 

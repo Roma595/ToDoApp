@@ -1,6 +1,5 @@
 package com.example.todoappandroid
 
-import TaskViewModel
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
@@ -23,7 +22,7 @@ class CreateTaskFragment : Fragment() {
 
     private lateinit var categoryAdapter: CategoryAdapter
     private var selectedCategory: Category? = null
-    private val viewModel: TaskViewModel by activityViewModels()  // ← ОБЩАЯ ViewModel
+    private val viewModel: TaskViewModel by activityViewModels()
     private var selectedColor: Int = Color.parseColor("#ED9121")
 
     override fun onCreateView(
@@ -127,14 +126,11 @@ class CreateTaskFragment : Fragment() {
             false
         )
 
-        // Предзаполняем категории
-        val defaultCategories = listOf(
-            Category(name = "Работа", color = "#FF6B6B"),
-            Category(name = "Дом", color = "#4ECDC4"),
-            Category(name = "Учеба", color = "#45B7D1"),
-            Category(name = "Личное", color = "#FFA07A")
-        )
-        categoryAdapter.setCategories(defaultCategories)
+        // ⭐ ЗАГРУЖАЕМ КАТЕГОРИИ ИЗ БД
+        // (дефолтные уже добавлены в ViewModel.init())
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+            categoryAdapter.setCategories(categories)
+        }
     }
 
     // ========== ДИАЛОГ ДОБАВЛЕНИЯ НОВОЙ КАТЕГОРИИ ==========
@@ -213,11 +209,25 @@ class CreateTaskFragment : Fragment() {
                 if (name.isNotEmpty()) {
                     val hexColor = String.format("#%06X", 0xFFFFFF and selectedColor)
                     val newCategory = Category(name = name, color = hexColor)
+
+                    // ⭐ ДОБАВЛЯЕМ В VIEWMODEL (сохраняется в БД)
+                    viewModel.addCategory(newCategory)
+
+                    // Также добавляем в адаптер (для локального показа)
                     categoryAdapter.addCategory(newCategory)
                     selectedCategory = newCategory
-                    Toast.makeText(requireContext(), "Категория \"$name\" создана!", Toast.LENGTH_SHORT).show()
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Категория \"$name\" создана!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
-                    Toast.makeText(requireContext(), "Введите название категории", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Введите название категории",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
             .setNegativeButton("Отмена", null)
