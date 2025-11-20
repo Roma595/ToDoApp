@@ -12,11 +12,6 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     private val taskDao = db.taskDao()
     private val categoryDao = db.categoryDao()
 
-    init {
-        // ⭐ При создании ViewModel проверяем и добавляем дефолтные категории
-        initializeDefaultCategories()
-    }
-
     // Все задачи из БД
     private val allTasksFromDb: LiveData<List<TaskEntity>> = taskDao.getAllTasks()
 
@@ -112,29 +107,4 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // ========== ИНИЦИАЛИЗАЦИЯ ДЕФОЛТНЫХ КАТЕГОРИЙ ==========
-    private fun initializeDefaultCategories() {
-        viewModelScope.launch {
-            // Получаем количество категорий
-            val count = try {
-                categoryDao.getCategoryCount()
-            } catch (e: Exception) {
-                0
-            }
-
-            // Если категорий нет - добавляем дефолтные
-            if (count == 0) {
-                val defaultCategories = listOf(
-                    CategoryEntity(name = "Работа", color = "#FF6B6B"),
-                    CategoryEntity(name = "Дом", color = "#4ECDC4"),
-                    CategoryEntity(name = "Учеба", color = "#45B7D1"),
-                    CategoryEntity(name = "Личное", color = "#FFA07A")
-                )
-
-                for (category in defaultCategories) {
-                    categoryDao.insert(category)
-                }
-            }
-        }
-    }
 }

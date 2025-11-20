@@ -4,14 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [TaskEntity::class, CategoryEntity::class],
-    version = 1
+    entities = [TaskEntity::class, CategoryEntity::class],  // ← Какие таблицы будут
+    version = 1,                                             // ← Версия БД
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
+    // ← Методы для получения DAO
     abstract fun taskDao(): TaskDao
     abstract fun categoryDao(): CategoryDao
 
@@ -24,18 +25,8 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "todo_database"
+                    "todo_database"  // ← Имя файла БД
                 )
-                    .addCallback(object : RoomDatabase.Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            // ⭐ Добавляем дефолтные категории при ПЕРВОМ создании БД
-                            db.execSQL("INSERT INTO categories (name, color) VALUES ('Работа', '#FF6B6B')")
-                            db.execSQL("INSERT INTO categories (name, color) VALUES ('Дом', '#4ECDC4')")
-                            db.execSQL("INSERT INTO categories (name, color) VALUES ('Учеба', '#45B7D1')")
-                            db.execSQL("INSERT INTO categories (name, color) VALUES ('Личное', '#FFA07A')")
-                        }
-                    })
                     .build()
                 INSTANCE = instance
                 instance
