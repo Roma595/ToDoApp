@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
 
 class CategoryAdapter(
     private val onCategoryClick: (Category) -> Unit,
@@ -29,7 +28,7 @@ class CategoryAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == categories.size) 1 else 0  // 1 = добавить, 0 = категория
+        return if (position == categories.size) 1 else 0  // 1 = добавить категорию, 0 = существующая категория
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -57,7 +56,7 @@ class CategoryAdapter(
     }
     fun addCategory(category: Category) {
         categories.add(category)
-        notifyItemInserted(categories.size - 1)  // Не пересчитываем весь список, а добавляем одну позицию
+        notifyItemInserted(categories.size - 1)
     }
     override fun getItemCount() = categories.size + 1  // +1 для кнопки добавить
 
@@ -75,7 +74,7 @@ class CategoryAdapter(
 
                 // Если выбрана — добавляем рамку
                 if (isSelected) {
-                    setStroke(4, Color.BLACK)
+                    setStroke(5, Color.parseColor("#6750A4"))
                 } else {
                     setStroke(0, Color.TRANSPARENT)
                 }

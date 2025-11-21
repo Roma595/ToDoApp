@@ -6,13 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [TaskEntity::class, CategoryEntity::class],  // ← Какие таблицы будут
-    version = 1,                                             // ← Версия БД
+    entities = [TaskEntity::class, CategoryEntity::class],
+    version = 1,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    // ← Методы для получения DAO
     abstract fun taskDao(): TaskDao
     abstract fun categoryDao(): CategoryDao
 
@@ -25,7 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "todo_database"  // ← Имя файла БД
+                    "todo_database"
                 )
                     .build()
                 INSTANCE = instance

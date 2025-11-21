@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "categories")
 data class CategoryEntity(
     @PrimaryKey
-    val name: String,     // Название категории (уникальное, как ключ)
-    val color: String      // Цвет в формате #RRGGBB
+    val name: String,
+    val color: String
 )
 // Функция для преобразования Entity в Model
 fun CategoryEntity.toCategory() = Category(

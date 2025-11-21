@@ -39,17 +39,17 @@ class CreateTaskFragment : Fragment() {
         // Скрываем bottom nav
         (activity as? MainActivity)?.findViewById<View>(R.id.bottom_nav_menu)?.visibility = View.GONE
 
-        // ========== ИНИЦИАЛИЗАЦИЯ ЭЛЕМЕНТОВ ==========
+        // Элементы
         val topAppBar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
         val titleEditText = view.findViewById<EditText>(R.id.taskTitleEditText)
         val dateEditText = view.findViewById<EditText>(R.id.taskDateEditText)
         val descriptionEditText = view.findViewById<EditText>(R.id.taskDescriptionEditText)
         val categoriesRecyclerView = view.findViewById<RecyclerView>(R.id.categoriesRecyclerView)
 
-        // ========== ИНИЦИАЛИЗАЦИЯ КАРУСЕЛИ КАТЕГОРИЙ ==========
+        // Карусель категорий
         setupCategoryCarousel(categoriesRecyclerView)
 
-        // ========== КАЛЕНДАРЬ ==========
+        // Календарь
         dateEditText.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Выберите дату")
@@ -60,12 +60,12 @@ class CreateTaskFragment : Fragment() {
             datePicker.show(parentFragmentManager, "datePicker")
         }
 
-        // ========== ИКОНКА "НАЗАД" (стрелка влево) ==========
+        // Стрелка назад
         topAppBar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
-        // ========== ИКОНКА "СОХРАНИТЬ" (галочка) ==========
+        // Галочка сохранить
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_save -> {
@@ -80,7 +80,7 @@ class CreateTaskFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        // Создаём задачу со всеми данными
+
                         val newTask = Task(
                             title = title,
                             description = if (description.isNotEmpty()) description else null,
@@ -90,15 +90,7 @@ class CreateTaskFragment : Fragment() {
                             isCompleted = false
                         )
 
-                        // ✅ ДОБАВЛЯЕМ ЗАДАЧУ В VIEWMODEL
                         viewModel.addTask(newTask)
-
-                        Toast.makeText(
-                            requireContext(),
-                            "Задача \"$title\" создана!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
                         findNavController().navigateUp()
                     }
                     true
@@ -108,7 +100,7 @@ class CreateTaskFragment : Fragment() {
         }
     }
 
-    // ========== НАСТРОЙКА КАРУСЕЛИ КАТЕГОРИЙ ==========
+    // Настройка карусели категорий
     private fun setupCategoryCarousel(recyclerView: RecyclerView) {
         categoryAdapter = CategoryAdapter(
             onCategoryClick = { category ->
@@ -126,14 +118,13 @@ class CreateTaskFragment : Fragment() {
             false
         )
 
-        // ⭐ ЗАГРУЖАЕМ КАТЕГОРИИ ИЗ БД
-        // (дефолтные уже добавлены в ViewModel.init())
+        // Загружаем категории из БД
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
             categoryAdapter.setCategories(categories)
         }
     }
 
-    // ========== ДИАЛОГ ДОБАВЛЕНИЯ НОВОЙ КАТЕГОРИИ ==========
+    // Добавление новой категории
     private fun showAddCategoryDialog() {
         val dialogView = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
@@ -148,7 +139,7 @@ class CreateTaskFragment : Fragment() {
             ).apply { bottomMargin = 32 }
         }
 
-        // ========== КОНТЕЙНЕР ДЛЯ КРУЖКА И ТЕКСТА ==========
+
         val colorContainer = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
@@ -158,7 +149,7 @@ class CreateTaskFragment : Fragment() {
             gravity = android.view.Gravity.CENTER_VERTICAL
         }
 
-        // Большой кружок цвета (кликабельный)
+
         val colorCircle = View(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(100, 100).apply {
                 marginEnd = 24
@@ -166,7 +157,7 @@ class CreateTaskFragment : Fragment() {
             background = android.graphics.drawable.GradientDrawable().apply {
                 shape = android.graphics.drawable.GradientDrawable.OVAL
                 setColor(selectedColor)
-                setStroke(3, Color.GRAY)
+                setStroke(4, Color.parseColor("#6750A4"))
             }
             isClickable = true
             isFocusable = true
@@ -178,14 +169,12 @@ class CreateTaskFragment : Fragment() {
                         (this@apply.background as? android.graphics.drawable.GradientDrawable)?.setColor(color)
                     }
                     override fun onCancel(dialog: AmbilWarnaDialog?) {
-                        // ничего не делаем
                     }
                 })
                 dialog.show()
             }
         }
 
-        // Текст "Цвет категории"
         val colorLabel = android.widget.TextView(requireContext()).apply {
             text = "Цвет категории"
             textSize = 16f
@@ -210,18 +199,13 @@ class CreateTaskFragment : Fragment() {
                     val hexColor = String.format("#%06X", 0xFFFFFF and selectedColor)
                     val newCategory = Category(name = name, color = hexColor)
 
-                    // ⭐ ДОБАВЛЯЕМ В VIEWMODEL (сохраняется в БД)
+
                     viewModel.addCategory(newCategory)
 
-                    // Также добавляем в адаптер (для локального показа)
+
                     categoryAdapter.addCategory(newCategory)
                     selectedCategory = newCategory
-
-                    Toast.makeText(
-                        requireContext(),
-                        "Категория \"$name\" создана!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    
                 } else {
                     Toast.makeText(
                         requireContext(),

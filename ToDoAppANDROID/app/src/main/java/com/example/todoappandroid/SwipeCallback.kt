@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 abstract class SwipeCallback(context: Context) : ItemTouchHelper.Callback() {
 
     private val background = ColorDrawable(Color.parseColor("#FF6B6B"))
-    // ⭐ Используем @drawable/ic_delete
     private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete)
 
     override fun getMovementFlags(
@@ -43,7 +42,7 @@ abstract class SwipeCallback(context: Context) : ItemTouchHelper.Callback() {
         val itemView = viewHolder.itemView
         val itemHeight = itemView.bottom - itemView.top
 
-        // Рисуем красный фон
+
         background.setBounds(
             itemView.right + dX.toInt(),
             itemView.top,
@@ -52,7 +51,7 @@ abstract class SwipeCallback(context: Context) : ItemTouchHelper.Callback() {
         )
         background.draw(c)
 
-        // Рисуем иконку корзины
+
         if (dX < -100) {
             deleteIcon?.let { icon ->
                 val iconMargin = (itemHeight - icon.intrinsicHeight) / 2

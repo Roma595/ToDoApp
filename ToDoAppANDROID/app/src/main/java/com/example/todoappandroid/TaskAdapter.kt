@@ -32,7 +32,6 @@ class TaskAdapter(
         fun bind(task: Task) {
             titleTextView.text = task.title
 
-            // ⭐ КЛЮЧЕВОЙ МОМЕНТ: убираем старый слушатель ДО изменения isChecked
             checkBox.setOnCheckedChangeListener(null)
             checkBox.isChecked = task.isCompleted
 
@@ -55,19 +54,11 @@ class TaskAdapter(
                 dateTextView.visibility = View.GONE
             }
 
-            // ⭐ КЛЮЧЕВОЙ МОМЕНТ: назначаем слушатель ПОСЛЕ всех изменений
             checkBox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked != task.isCompleted) {  // Проверяем, что действительно изменилось
+                if (isChecked != task.isCompleted) {
                     onTaskToggle(task.copy(isCompleted = isChecked))
                 }
             }
-        }
-    }
-    fun deleteTask(position: Int) {
-        val currentList = currentList.toMutableList()
-        if (position >= 0 && position < currentList.size) {
-            currentList.removeAt(position)
-            submitList(currentList)
         }
     }
 }

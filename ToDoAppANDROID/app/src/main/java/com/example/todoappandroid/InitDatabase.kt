@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 
 object InitDatabase {
     fun addDefaultCategories(context: Context) {
-        // Запускаем в фоновом потоке (чтобы не зависать UI)
+        // Запускаем в фоновом потоке
         GlobalScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getInstance(context)
             val dao = db.categoryDao()

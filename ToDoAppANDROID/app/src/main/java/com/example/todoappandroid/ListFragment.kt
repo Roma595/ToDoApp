@@ -27,9 +27,6 @@ class ListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel.categories.observe(this) {
-            // ничего не делай, просто нужна подписка для запуска Room
-        }
         return inflater.inflate(R.layout.fragment_list, container, false)
     }
 
@@ -40,7 +37,6 @@ class ListFragment : Fragment() {
         completedTasksRecyclerView = view.findViewById(R.id.completedTasksRecyclerView)
         createTaskButton = view.findViewById(R.id.createTaskButton)
 
-        // ========== АДАПТЕРЫ ==========
         activeTaskAdapter = TaskAdapter { task ->
             viewModel.updateTask(task)
         }
@@ -51,8 +47,8 @@ class ListFragment : Fragment() {
         activeTasksRecyclerView.adapter = activeTaskAdapter
         completedTasksRecyclerView.adapter = completedTaskAdapter
 
-// ========== SWIPE TO DELETE ДЛЯ АКТИВНЫХ ЗАДАЧ ==========
-        val activeSwipeCallback = object : SwipeCallback(requireContext()) {  // ← добавь requireContext()
+    // Удаление по свайпу для активных
+        val activeSwipeCallback = object : SwipeCallback(requireContext()) {
             override fun onDelete(position: Int) {
                 val task = activeTaskAdapter.currentList.getOrNull(position)
                 if (task != null) {
@@ -62,8 +58,8 @@ class ListFragment : Fragment() {
         }
         ItemTouchHelper(activeSwipeCallback).attachToRecyclerView(activeTasksRecyclerView)
 
-// ========== SWIPE TO DELETE ДЛЯ ВЫПОЛНЕННЫХ ЗАДАЧ ==========
-        val completedSwipeCallback = object : SwipeCallback(requireContext()) {  // ← добавь requireContext()
+    // Удаление по свайпу для выполненных
+        val completedSwipeCallback = object : SwipeCallback(requireContext()) {
             override fun onDelete(position: Int) {
                 val task = completedTaskAdapter.currentList.getOrNull(position)
                 if (task != null) {
@@ -73,7 +69,7 @@ class ListFragment : Fragment() {
         }
         ItemTouchHelper(completedSwipeCallback).attachToRecyclerView(completedTasksRecyclerView)
 
-        // ========== НАБЛЮДЕНИЕ ЗА ЗАДАЧАМИ ==========
+
         viewModel.activeTasks.observe(viewLifecycleOwner) { tasks ->
             activeTaskAdapter.submitList(tasks)
         }
@@ -82,7 +78,7 @@ class ListFragment : Fragment() {
             completedTaskAdapter.submitList(tasks)
         }
 
-        // ========== КНОПКА ==========
+        // Копка создать задачу
         createTaskButton.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_createTaskFragment)
         }

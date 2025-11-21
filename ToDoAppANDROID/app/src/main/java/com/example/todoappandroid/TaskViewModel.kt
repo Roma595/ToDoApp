@@ -60,7 +60,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // ⭐ КАТЕГОРИИ
+    // Категории
     val categories: LiveData<List<Category>> = object : LiveData<List<Category>>() {
         private val observer = androidx.lifecycle.Observer<List<CategoryEntity>> { entities ->
             value = entities.map { it.toCategory() }
@@ -75,8 +75,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // ========== ОПЕРАЦИИ С ЗАДАЧАМИ ==========
-    fun addTask(task: Task) {
+      fun addTask(task: Task) {
         viewModelScope.launch {
             taskDao.insert(task.toEntity())
         }
@@ -94,7 +93,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // ========== ОПЕРАЦИИ С КАТЕГОРИЯМИ ==========
+
     fun addCategory(category: Category) {
         viewModelScope.launch {
             categoryDao.insert(category.toEntity())

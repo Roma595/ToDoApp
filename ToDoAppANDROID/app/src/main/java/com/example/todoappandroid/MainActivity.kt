@@ -12,7 +12,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // ⭐ ДОБАВЛЯЕМ ДЕФОЛТНЫЕ КАТЕГОРИИ ПРИ ПЕРВОМ ЗАПУСКЕ
         InitDatabase.addDefaultCategories(this)
 
         val host: NavHostFragment = supportFragmentManager.findFragmentById(R.id.navFragment) as NavHostFragment? ?: return
