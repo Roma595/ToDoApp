@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.DiffUtil
 import com.google.android.material.checkbox.MaterialCheckBox
 
 class TaskAdapter(
-    private val onTaskToggle: (Task) -> Unit
+    private val onTaskToggle: (Task) -> Unit,
+    private val onTaskClick: (Task) -> Unit
 ) : ListAdapter<Task, TaskAdapter.TaskViewHolder>(TaskDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -28,6 +29,14 @@ class TaskAdapter(
         private val checkBox: MaterialCheckBox = itemView.findViewById(R.id.taskCheckBox)
         private val titleTextView: TextView = itemView.findViewById(R.id.taskTitle)
         private val dateTextView: TextView = itemView.findViewById(R.id.taskDate)
+        init {
+            itemView.setOnClickListener {
+                val task = getItem(bindingAdapterPosition)
+                if (task != null) {
+                    onTaskClick(task)
+                }
+            }
+        }
 
         fun bind(task: Task) {
             titleTextView.text = task.title

@@ -37,17 +37,19 @@ class ListFragment : Fragment() {
         completedTasksRecyclerView = view.findViewById(R.id.completedTasksRecyclerView)
         createTaskButton = view.findViewById(R.id.createTaskButton)
 
-        activeTaskAdapter = TaskAdapter { task ->
-            viewModel.updateTask(task)
-        }
-        completedTaskAdapter = TaskAdapter { task ->
-            viewModel.updateTask(task)
-        }
+        activeTaskAdapter = TaskAdapter(
+            onTaskToggle = { task -> viewModel.updateTask(task) },
+            onTaskClick = { task -> openEditTask(task) }
+        )
+        completedTaskAdapter = TaskAdapter(
+            onTaskToggle = { task -> viewModel.updateTask(task) },
+            onTaskClick = { task -> openEditTask(task) }
+        )
 
         activeTasksRecyclerView.adapter = activeTaskAdapter
         completedTasksRecyclerView.adapter = completedTaskAdapter
 
-    // Удаление по свайпу для активных
+        // Удаление по свайпу для активных
         val activeSwipeCallback = object : SwipeCallback(requireContext()) {
             override fun onDelete(position: Int) {
                 val task = activeTaskAdapter.currentList.getOrNull(position)
@@ -58,7 +60,7 @@ class ListFragment : Fragment() {
         }
         ItemTouchHelper(activeSwipeCallback).attachToRecyclerView(activeTasksRecyclerView)
 
-    // Удаление по свайпу для выполненных
+        // Удаление по свайпу для выполненных
         val completedSwipeCallback = object : SwipeCallback(requireContext()) {
             override fun onDelete(position: Int) {
                 val task = completedTaskAdapter.currentList.getOrNull(position)
@@ -83,4 +85,16 @@ class ListFragment : Fragment() {
             findNavController().navigate(R.id.action_listFragment_to_createTaskFragment)
         }
     }
+    private fun openEditTask(task: Task) {
+        val bundle = Bundle().apply {
+            putLong("task_id", task.id)
+            putString("task_title", task.title)
+            putString("task_description", task.description)
+            putString("task_date", task.date)
+            putString("task_category", task.category)
+            putBoolean("task_isCompleted", task.isCompleted)
+        }
+        findNavController().navigate(R.id.action_listFragment_to_editTaskFragment, bundle)
+    }
+
 }

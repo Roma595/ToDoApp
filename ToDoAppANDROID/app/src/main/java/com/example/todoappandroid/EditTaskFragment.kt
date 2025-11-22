@@ -18,7 +18,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import yuku.ambilwarna.AmbilWarnaDialog
 
-class CreateTaskFragment : Fragment() {
+class EditTaskFragment : Fragment() {
 
     private lateinit var categoryAdapter: CategoryAdapter
     private var selectedCategory: Category? = null
@@ -30,7 +30,7 @@ class CreateTaskFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_create_task, container, false)
+        return inflater.inflate(R.layout.fragment_edit_task, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,8 +46,33 @@ class CreateTaskFragment : Fragment() {
         val descriptionEditText = view.findViewById<EditText>(R.id.taskDescriptionEditText)
         val categoriesRecyclerView = view.findViewById<RecyclerView>(R.id.categoriesRecyclerView)
 
+        //Получаем данные
+        val taskId = arguments?.getLong("task_id") ?: -1L
+        val taskTitle = arguments?.getString("task_title") ?: ""
+        val taskDescription = arguments?.getString("task_description") ?: ""
+        val taskDate = arguments?.getString("task_date") ?: ""
+        val taskCategory = arguments?.getString("task_category") ?: ""
+        val taskIsCompleted = arguments?.getBoolean("task_isCompleted") ?: false
+
         // Карусель категорий
         setupCategoryCarousel(categoriesRecyclerView)
+
+        // Заполняем все поля
+        titleEditText.setText(taskTitle)
+        descriptionEditText.setText(taskDescription)
+        dateEditText.setText(taskDate)
+
+        // Выбираем нужную категорию
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+            categoryAdapter.setCategories(categories)
+            if (taskCategory.isNotEmpty()) {
+                val categoryToSelect = categories.find { it.name == taskCategory }
+                if (categoryToSelect != null) {
+                    selectedCategory = categoryToSelect
+                    categoryAdapter.setSelectedCategory(categoryToSelect)
+                }
+            }
+        }
 
         // Календарь
         dateEditText.setOnClickListener {
@@ -81,16 +106,15 @@ class CreateTaskFragment : Fragment() {
                         ).show()
                     } else {
 
-                        val newTask = Task(
+                        val updatedTask = Task(
+                            id = taskId,
                             title = title,
                             description = if (description.isNotEmpty()) description else null,
                             date = if (date.isNotEmpty()) date else null,
-                            category = selectedCategory?.name,
-                            reminder = false,
-                            isCompleted = false
+                            category = selectedCategory?.name ?: taskCategory,
+                            isCompleted = taskIsCompleted
                         )
-
-                        viewModel.addTask(newTask)
+                        viewModel.updateTask(updatedTask)
                         findNavController().navigateUp()
                     }
                     true
@@ -105,6 +129,7 @@ class CreateTaskFragment : Fragment() {
         categoryAdapter = CategoryAdapter(
             onCategoryClick = { category ->
                 selectedCategory = category
+                categoryAdapter.setSelectedCategory(category)
             },
             onAddNewClick = {
                 showAddCategoryDialog()

@@ -35,7 +35,7 @@
             android:background="?attr/colorPrimary"
             app:menu="@menu/create_task_menu"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="Создать задачу"
+            app:title="Редактировать задачу"
             app:titleTextColor="@android:color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>

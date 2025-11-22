@@ -19,6 +19,9 @@
         <action
         android:id="@+id/action_listFragment_to_createTaskFragment"
         app:destination="@id/createTaskFragment" />
+        <action
+        android:id="@+id/action_listFragment_to_editTaskFragment"
+        app:destination="@id/editTaskFragment" />
 
     <fragment
         android:id="@+id/navigation_calendar"
@@ -39,4 +42,9 @@
         android:name="com.example.todoappandroid.CreateTaskFragment"
         android:label="fragment_create_task"
         tools:layout="@layout/fragment_create_task" />
+    <fragment
+        android:id="@+id/editTaskFragment"
+        android:name="com.example.todoappandroid.EditTaskFragment"
+        android:label="fragment_edit_task"
+        tools:layout="@layout/fragment_edit_task" />
 </navigation>
