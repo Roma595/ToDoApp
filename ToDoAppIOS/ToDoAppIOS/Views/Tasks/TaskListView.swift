@@ -49,7 +49,6 @@ struct TaskListView: View {
     var completedTasks: [TaskModel] {sortedTasks.filter { $0.isCompleted }}
     
     var body: some View {
-        
         VStack{
             HStack{
                 Picker("Категория",selection: $selectedCategory) {
@@ -79,15 +78,15 @@ struct TaskListView: View {
                         TaskItemView(task: task)
                     }
                     .onDelete{ indexSet in deleteActiveTasks(at: indexSet)}
-                }
-                            
+                }.listRowBackground(Color(.systemGray6).opacity(0.7))
                 Section(header: Text("Выполненные задачи")) {
                     ForEach(completedTasks) { task in
                         TaskItemView(task: task)
                     }
                     .onDelete { indexSet in deleteCompletedTasks(at: indexSet)}
-                }
+                }.listRowBackground(Color(.systemGray6).opacity(0.7))
             }
+            .scrollContentBackground(.hidden)
         }
     }
     
@@ -105,5 +104,7 @@ struct TaskListView: View {
             modelContext.delete(task)
         }
     }
+    
+    
 }
 

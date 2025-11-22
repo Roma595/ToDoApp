@@ -36,8 +36,7 @@ struct ListView: View {
                     AddTaskView()
                         .interactiveDismissDisabled(true)
                 }
-                .background(Color(.systemGray6)
-                    .ignoresSafeArea())
+                    
             }
             
         }

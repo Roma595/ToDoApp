@@ -19,12 +19,5 @@ struct ListViewToolbar: ToolbarContent {
                 Image(systemName: "plus")
             }
         }
-        ToolbarItem(placement: .navigationBarTrailing) {
-            Button {
-                
-            } label: {
-                Image(systemName: "ellipsis")
-            }
-        }
     }
 }

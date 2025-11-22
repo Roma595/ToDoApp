@@ -11,6 +11,8 @@ struct CategoryCircleItemView: View {
     let category: CategoryModel
     let isSelected: Bool
     let onTap: () -> Void
+    
+    @State private var showMenu = false
     var body: some View {
         Circle()
             .fill(category.color)
@@ -23,6 +25,14 @@ struct CategoryCircleItemView: View {
             .animation(.spring(), value: isSelected)
             .onTapGesture {
                 onTap()
+            }
+            .onLongPressGesture {
+                showMenu = true
+            }
+            .confirmationDialog("Действия с категорией", isPresented: $showMenu) {
+                Button("Редактировать") { }
+                Button("Удалить", role: .destructive) { }
+                Button("Отмена", role: .cancel) { }
             }
     }
 }

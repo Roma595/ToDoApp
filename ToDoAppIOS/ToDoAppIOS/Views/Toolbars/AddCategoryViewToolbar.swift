@@ -18,5 +18,19 @@ struct AddCategoryViewToolbar: ToolbarContent {
                 Image(systemName: "chevron.left")
             }
         }
+        ToolbarItem(placement: .navigationBarTrailing) {
+            Button(action: {
+//                add_new_task()
+//                if (!showAlert){
+//                    dismiss()
+//                }
+                
+            }) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.blue)
+                    .frame(width: 30, height: 30)
+            }
+        }
     }
 }

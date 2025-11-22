@@ -17,6 +17,8 @@ struct AddCategoryView: View {
     @State private var categoryName:String = ""
     @State private var selectedColor:Color = .black
     
+    @State private var showAlert = false
+    
     var body: some View {
         NavigationStack{
             VStack(spacing: 20){
@@ -29,10 +31,10 @@ struct AddCategoryView: View {
                     .padding(.horizontal)
                 
                 Button(action: {
-                    let newCategory = CategoryModel(name: categoryName, color: selectedColor)
-                    modelContext.insert(newCategory)
-                    try_save_context()
-                    dismiss()
+                    add_new_category()
+                    if (!showAlert){
+                        dismiss()
+                    }
                 }) {
                     Rectangle()
                         .fill(.white)
@@ -45,6 +47,11 @@ struct AddCategoryView: View {
                         .shadow(color: Color.black.opacity(0.15), radius: 3, x: 0, y: 2)
                     
                 }
+//                        .alert("Не все поля заполнены", isPresented: $showAlert) {
+//                    Button("Ок", role: .cancel) { }
+//                } message: {
+//                    Text("Введите название категории")
+//                }
                 
             }
             .toolbar{
@@ -53,6 +60,16 @@ struct AddCategoryView: View {
         }
         
         
+    }
+    
+    func add_new_category(){
+//        if categoryName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+//            showAlert = true
+//            return
+//        }
+        let newCategory = CategoryModel(name: categoryName, color: selectedColor)
+        modelContext.insert(newCategory)
+        try_save_context()
     }
     func try_save_context(){
         do {

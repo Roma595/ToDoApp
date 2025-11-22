@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TaskItemView: View {
     let task: TaskModel
-
+    @State var isEditing: Bool = false
     var body: some View {
         HStack {
             Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
@@ -17,20 +17,36 @@ struct TaskItemView: View {
                 .onTapGesture {withAnimation {
                     task.isCompleted.toggle()
                 } }
-            VStack(alignment: .leading) {
-                Text(task.name)
-                    .font(.body)
-                    .bold()
-                
-                if task.date != nil {
-                    Text(task.date!, style: .date)
-                        .font(.caption)
-                        .foregroundColor(.gray)
+            HStack{
+                VStack(alignment: .leading) {
+                    Text(task.name)
+                        .font(.body)
+                        .bold()
+                    
+                    if task.date != nil {
+                        Text(dateFormatter.string(from: task.date!) )
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
                 }
+                Spacer()
             }
-            Spacer()
+            .contentShape(Rectangle())
+            .onTapGesture {
+                isEditing = true
+            }
+            .navigationDestination(isPresented: $isEditing){
+                EditTaskView(task: task)
+            }
         }
         .padding(.vertical, 6)
+    }
+    
+    private var dateFormatter: DateFormatter {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_RU")
+            formatter.dateStyle = .long
+            return formatter
     }
 }
 

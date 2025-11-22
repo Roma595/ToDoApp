@@ -12,7 +12,7 @@ struct ContextView: View {
     
     var body: some View {
         TabView(selection: $selectedTabIndex) {
-            Tab("Список", systemImage: "list.bullet",  value: 0){
+            Tab("Задачи", systemImage: "list.bullet",  value: 0){
                 ListView()
             }
             Tab("Календарь", systemImage: "calendar", value: 1){

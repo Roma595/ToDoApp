@@ -15,7 +15,7 @@ struct CategoryScrollView: View {
     
     @Binding var activeSheet: AddToDoSheet?
     @Binding var selectedCategory: CategoryModel?
-    @State private var selectedIndex: Int? = nil
+    @State var selectedIndex: Int?
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -24,8 +24,9 @@ struct CategoryScrollView: View {
                     VStack{
                         CategoryCircleItemView(
                             category: category,
-                            isSelected: selectedIndex == index,
+                            isSelected: selectedCategory?.name == category.name,
                             onTap: {tap_on_item(index: index)}
+                            
                         )
                         .padding(.vertical, 6)
                         Text(category.name)
@@ -42,11 +43,20 @@ struct CategoryScrollView: View {
                                 Image(systemName: "plus")
                                     .foregroundStyle(.white)
                             )
+                            .padding(.vertical, 6)
                         Text("Новая").font(.caption)
                     }
                 }
             }
             .padding(.horizontal)
+        }
+    }
+    
+    func try_save_context(){
+        do {
+            try modelContext.save()
+        } catch {
+            print("Ошибка сохранения: \(error)")
         }
     }
     
@@ -57,9 +67,10 @@ struct CategoryScrollView: View {
         }
         else{
             selectedIndex = index
-            let reversedCategories = Array(categories.enumerated().reversed())
+            let reversedCategories = Array(categories.enumerated())
             selectedCategory = reversedCategories[index].element
         }
     }
+
 }
 

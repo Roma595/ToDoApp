@@ -1,31 +1,38 @@
 //
-//  AddTaskView.swift
+//  EditTaskView.swift
 //  ToDoAppIOS
 //
-//  Created by Рома Котков on 17.09.2025.
+//  Created by Рома Котков on 19.11.2025.
 //
 
 import SwiftUI
 import SwiftData
 
-struct AddTaskView: View {
+struct EditTaskView: View {
+    @State var task: TaskModel
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TaskModel.id) private var tasks: [TaskModel]
-    
     @State private var activeSheet: AddToDoSheet?
-    @State private var showAlert = false
     
-    @State private var taskName: String = ""
-    @State private var selectedDate: Date? = nil
-    @State private var notificationDate: Date? = nil
-    @State private var notificationTime: Date? = nil
-    @State private var taskCategory: CategoryModel? = nil
-    @State private var taskNote: String = ""
+    
+    @State private var taskName: String
+    @State private var selectedDate: Date?
+    @State private var notificationDate: Date?
+    @State private var notificationTime: Date?
+    @State private var taskCategory: CategoryModel?
+    @State private var taskNote: String
     
     @FocusState private var isFocusedText: Bool
     
+    init(task: TaskModel) {
+        self.task = task
+        self.taskName = task.name
+        self.selectedDate = task.date
+        self.taskCategory = task.category
+        self.taskNote = task.note ?? ""
+    }
     var body: some View {
         NavigationStack {
             ScrollView{
@@ -104,7 +111,13 @@ struct AddTaskView: View {
             //MARK: - Toolbar
             .padding(12)
             .toolbar {
-                AddTaskToolbar(showAlert: $showAlert, add_new_task: {add_new_task()})
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Text("Сохранить")
+                    }
+                }
             }
             //MARK: - Sheet
             .sheet(item: $activeSheet) {sheet in
@@ -119,30 +132,11 @@ struct AddTaskView: View {
                         .interactiveDismissDisabled(true)
                 case .category:
                     AddCategoryView()
-                        .presentationDetents([.height(300)])
+                        .presentationDetents([.medium])
                         .interactiveDismissDisabled(true)
                 }
             }
         }
-    }
-    
-    
-    func try_save_context(){
-        do {
-            try modelContext.save()
-        } catch {
-            print("Ошибка сохранения: \(error)")
-        }
-    }
-    
-    func add_new_task(){
-        if taskName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            showAlert = true
-            return
-        }
-        let newTask = TaskModel(name: taskName, isCompleted: false, date: selectedDate, category: taskCategory, note: taskNote)
-        modelContext.insert(newTask)
-        try_save_context()
     }
     
     private var dateFormatter: DateFormatter {
@@ -151,10 +145,9 @@ struct AddTaskView: View {
             formatter.dateStyle = .long
             return formatter
     }
-    
 }
 
-// MARK: - Preview
-#Preview {
-    AddTaskView()
-}
+//#Preview {
+//    EditTaskView()
+//}
+    
