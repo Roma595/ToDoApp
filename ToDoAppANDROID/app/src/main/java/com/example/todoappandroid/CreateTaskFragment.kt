@@ -386,7 +386,6 @@ class CreateTaskFragment : Fragment() {
             setPadding(32, 32, 32, 32)
         }
 
-        // Поле для названия
         val nameInput = android.widget.EditText(requireContext()).apply {
             setText(category.name)
             hint = "Название категории"
@@ -396,7 +395,6 @@ class CreateTaskFragment : Fragment() {
             ).apply { bottomMargin = 32 }
         }
 
-        // Выбор цвета
         val colorContainer = android.widget.LinearLayout(requireContext()).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
             layoutParams = android.widget.LinearLayout.LayoutParams(
@@ -457,20 +455,42 @@ class CreateTaskFragment : Fragment() {
             .setView(dialogView)
             .setPositiveButton("Сохранить") { _, _ ->
                 val newName = nameInput.text.toString().trim()
-                if (newName.isNotEmpty()) {
-                    val updatedCategory = Category(
-                        name = newName,
-                        color = currentColor
-                    )
-                    // Обновляем в БД (если у тебя есть updateCategory в ViewModel)
-                    viewModel.updateCategory(updatedCategory)
-                    categoryAdapter.notifyDataSetChanged()
-                } else {
+
+
+                if (newName.isEmpty()) {
                     Toast.makeText(
                         requireContext(),
                         "Введите название категории",
                         Toast.LENGTH_SHORT
                     ).show()
+                    return@setPositiveButton
+                }
+
+
+                if (newName != category.name) {
+                    // Проверяем уникальность
+                    val categoryExists = viewModel.categories.value?.any { it.name == newName } ?: false
+
+                    if (categoryExists) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Категория '$newName' уже существует",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@setPositiveButton
+                    }
+
+                    // Удаляем старую, создаём новую
+                    viewModel.updateCategoryNameInTasks(category.name, newName)
+                    viewModel.deleteCategory(category.name)
+                    val newCategory = Category(name = newName, color = currentColor)
+                    viewModel.addCategory(newCategory)
+                } else {
+                    // Только цвет изменился
+                    viewModel.deleteCategory(category.name)
+                    val updatedCategory = Category(name = newName, color = currentColor)
+                    viewModel.addCategory(updatedCategory)
+
                 }
             }
             .setNegativeButton("Отмена", null)

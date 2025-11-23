@@ -138,33 +138,22 @@ class ListFragment : Fragment() {
             .show()
     }
     private fun showFilterMenu() {
-
-        val allTasks = viewModel.sortedTasks.value ?: emptyList()
+        // Получаем актуальные данные
+        val allTasks = viewModel.tasks.value ?: emptyList()
         val categories = viewModel.categories.value ?: emptyList()
 
-        // Фильтруем категории - только с задачами
+        // Показывайем категории, у которых есть задачи
         val categoriesWithTasks = categories.filter { category ->
             allTasks.any { task -> task.category == category.name }
         }
 
         val categoryNames = mutableListOf("Все категории")
+        categoryNames.addAll(categoriesWithTasks.map { it.name })
 
-        if (categoriesWithTasks.isNotEmpty()) {
-            categoryNames.addAll(categoriesWithTasks.map { it.name })
-        }
-
-
-        var selectedIndex = if (currentFilter == null) {
-            0
-        } else {
-            categoryNames.indexOf(currentFilter)
-        }
-
-        // Если текущий фильтр не найден
+        // Находим текущий выбранный индекс
+        var selectedIndex = categoryNames.indexOf(currentFilter)
         if (selectedIndex == -1) {
-            selectedIndex = 0
-            currentFilter = null
-            viewModel.setFilterByCategory(null)
+            selectedIndex = 0  // "Все категории" по умолчанию
         }
 
         AlertDialog.Builder(requireContext())
@@ -173,10 +162,11 @@ class ListFragment : Fragment() {
                 categoryNames.toTypedArray(),
                 selectedIndex
             ) { dialog, which ->
-                val selectedCategory = if (which == 0 || categoriesWithTasks.isEmpty()) {
-                    null
+                // Сохраняем выбор
+                val selectedCategory = if (which == 0) {
+                    null  // "Все категории"
                 } else {
-                    categoriesWithTasks[which - 1].name
+                    categoriesWithTasks[which - 1].name  // Выбранная категория
                 }
 
                 currentFilter = selectedCategory
@@ -185,6 +175,9 @@ class ListFragment : Fragment() {
             }
             .show()
     }
+
+
+
 
     private fun openEditTask(task: Task) {
         val bundle = Bundle().apply {
