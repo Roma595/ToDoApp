@@ -414,7 +414,7 @@ class EditTaskFragment : Fragment() {
                         name = newName,
                         color = currentColor
                     )
-                    // Обновляем в БД (если у тебя есть updateCategory в ViewModel)
+                    // Обновляем в БД
                     viewModel.updateCategory(updatedCategory)
                     categoryAdapter.notifyDataSetChanged()
                 } else {
@@ -423,6 +423,31 @@ class EditTaskFragment : Fragment() {
                         "Введите название категории",
                         Toast.LENGTH_SHORT
                     ).show()
+                    return@setPositiveButton
+                }
+                if (newName != category.name) {
+                    viewModel.categories.observe(viewLifecycleOwner) { allCategories ->
+                        val categoryExists = viewModel.categories.value?.any { it.name == newName } ?: false
+
+                        if (categoryExists) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Категория '$newName' уже существует",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@observe
+                        }
+                        viewModel.updateCategoryNameInTasks(category.name, newName)
+                        viewModel.deleteCategory(category.name)
+                        val newCategory = Category(name = newName, color = currentColor)
+                        viewModel.addCategory(newCategory)
+                    }
+                } else {
+                    //  Если только цвет изменился
+                    viewModel.deleteCategory(category.name)
+                    val updatedCategory = Category(name = newName, color = currentColor)
+                    viewModel.addCategory(updatedCategory)
+
                 }
             }
             .setNegativeButton("Отмена", null)

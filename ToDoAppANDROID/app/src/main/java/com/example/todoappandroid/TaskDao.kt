@@ -20,4 +20,6 @@ interface TaskDao {
 
     @Query("DELETE FROM tasks WHERE category = :categoryName")
     suspend fun deleteTasksByCategory(categoryName: String)
+    @Query("UPDATE tasks SET category = :newName WHERE category = :oldName")
+    suspend fun updateTasksCategory(oldName: String, newName: String)
 }

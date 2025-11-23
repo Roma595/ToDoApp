@@ -5,4 +5,9 @@
         android:title="Сортировка"
         android:icon="@drawable/ic_sort"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_filter"
+        android:title="Фильтр"
+        android:icon="@drawable/ic_filter"
+        app:showAsAction="ifRoom" />
 </menu>

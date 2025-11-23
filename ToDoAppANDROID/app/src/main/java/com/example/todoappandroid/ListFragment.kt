@@ -24,6 +24,8 @@ class ListFragment : Fragment() {
     private lateinit var topAppBar: MaterialToolbar
     private val viewModel: TaskViewModel by activityViewModels()
 
+    private var currentFilter: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,6 +80,10 @@ class ListFragment : Fragment() {
                     showSortMenu()
                     true
                 }
+                R.id.action_filter -> {
+                    showFilterMenu()
+                    true
+                }
                 else -> false
             }
         }
@@ -93,6 +99,22 @@ class ListFragment : Fragment() {
         // Копка создать задачу
         createTaskButton.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_createTaskFragment)
+        }
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+            viewModel.sortedTasks.observe(viewLifecycleOwner) { allTasks ->
+                // Проверяем: есть ли ещё задачи в текущей отфильтрованной категории
+                if (currentFilter != null) {
+                    val hasTasksInCurrentFilter = allTasks.any { task ->
+                        task.category == currentFilter
+                    }
+
+                    // Если задач в текущем фильтре нет - переключаемся на "Все"
+                    if (!hasTasksInCurrentFilter) {
+                        currentFilter = null
+                        viewModel.setFilterByCategory(null)
+                    }
+                }
+            }
         }
     }
     private fun showSortMenu() {
@@ -112,6 +134,54 @@ class ListFragment : Fragment() {
                     else -> TaskViewModel.SortBy.BY_CREATION
                 }
                 viewModel.setSortBy(sortBy)
+            }
+            .show()
+    }
+    private fun showFilterMenu() {
+
+        val allTasks = viewModel.sortedTasks.value ?: emptyList()
+        val categories = viewModel.categories.value ?: emptyList()
+
+        // Фильтруем категории - только с задачами
+        val categoriesWithTasks = categories.filter { category ->
+            allTasks.any { task -> task.category == category.name }
+        }
+
+        val categoryNames = mutableListOf("Все категории")
+
+        if (categoriesWithTasks.isNotEmpty()) {
+            categoryNames.addAll(categoriesWithTasks.map { it.name })
+        }
+
+
+        var selectedIndex = if (currentFilter == null) {
+            0
+        } else {
+            categoryNames.indexOf(currentFilter)
+        }
+
+        // Если текущий фильтр не найден
+        if (selectedIndex == -1) {
+            selectedIndex = 0
+            currentFilter = null
+            viewModel.setFilterByCategory(null)
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Фильтр по категориям")
+            .setSingleChoiceItems(
+                categoryNames.toTypedArray(),
+                selectedIndex
+            ) { dialog, which ->
+                val selectedCategory = if (which == 0 || categoriesWithTasks.isEmpty()) {
+                    null
+                } else {
+                    categoriesWithTasks[which - 1].name
+                }
+
+                currentFilter = selectedCategory
+                viewModel.setFilterByCategory(selectedCategory)
+                dialog.dismiss()
             }
             .show()
     }

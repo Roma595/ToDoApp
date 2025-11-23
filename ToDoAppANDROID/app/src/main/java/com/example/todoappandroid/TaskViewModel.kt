@@ -18,9 +18,13 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         ALPHABETICAL,   // по алфавиту
         BY_DATE         // по дате
     }
-    // Все задачи из БД
     private val _sortBy = MutableLiveData(SortBy.BY_CREATION)
     val sortBy: LiveData<SortBy> = _sortBy
+    private val _filterByCategory = MutableLiveData<String?>(null)
+    val filterByCategory: LiveData<String?> = _filterByCategory
+
+
+    // Все задачи из БД
     private val allTasksFromDb: LiveData<List<TaskEntity>> = taskDao.getAllTasks()
 
     // Преобразуем в Model
@@ -37,27 +41,43 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             allTasksFromDb.removeObserver(observer)
         }
     }
-        val sortedTasks: LiveData<List<Task>> = object : LiveData<List<Task>>() {
+    val tasks: LiveData<List<Task>> = _tasks
+
+    private fun filterTasks(tasks: List<Task>): List<Task> {
+        val category = _filterByCategory.value
+        return if (category == null || category.isEmpty()) {
+            tasks  // Все задачи
+        } else {
+            tasks.filter { it.category == category }  // Только выбранной категории
+        }
+    }
+    val sortedTasks: LiveData<List<Task>> = object : LiveData<List<Task>>() {
         private val tasksObserver = androidx.lifecycle.Observer<List<Task>> { allTasks ->
             updateSortedTasks(allTasks)
         }
 
         private val sortObserver = androidx.lifecycle.Observer<SortBy> { _ ->
-            _tasks.value?.let { updateSortedTasks(it) }
+            tasks.value?.let { updateSortedTasks(it) }
+        }
+        private val filterObserver = androidx.lifecycle.Observer<String?> { _ ->
+            tasks.value?.let { updateSortedTasks(it) }
         }
 
         private fun updateSortedTasks(tasks: List<Task>) {
-            value = sortTasks(tasks, _sortBy.value ?: SortBy.BY_CREATION)
+            val filtered = filterTasks(tasks)
+            value = sortTasks(filtered, sortBy.value ?: SortBy.BY_CREATION)
         }
 
         override fun onActive() {
-            _tasks.observeForever(tasksObserver)
-            _sortBy.observeForever(sortObserver)
+            tasks.observeForever(tasksObserver)
+            sortBy.observeForever(sortObserver)
+            filterByCategory.observeForever(filterObserver)
         }
 
         override fun onInactive() {
-            _tasks.removeObserver(tasksObserver)
-            _sortBy.removeObserver(sortObserver)
+            tasks.removeObserver(tasksObserver)
+            sortBy.removeObserver(sortObserver)
+            filterByCategory.removeObserver(filterObserver)
         }
 
     }
@@ -96,11 +116,11 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         override fun onActive() {
-            _tasks.observeForever(observer)
+            tasks.observeForever(observer)
         }
 
         override fun onInactive() {
-            _tasks.removeObserver(observer)
+            tasks.removeObserver(observer)
         }
     }
 
@@ -110,11 +130,11 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         override fun onActive() {
-            _tasks.observeForever(observer)
+            tasks.observeForever(observer)
         }
 
         override fun onInactive() {
-            _tasks.removeObserver(observer)
+            tasks.removeObserver(observer)
         }
     }
 
@@ -132,6 +152,16 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             categoryDao.getAllCategories().removeObserver(observer)
         }
     }
+    fun updateCategoryNameInTasks(oldName: String, newName: String) {
+        viewModelScope.launch {
+            taskDao.updateTasksCategory(oldName, newName)
+        }
+    }
+    fun deleteCategory(categoryName: String) {
+        viewModelScope.launch {
+            categoryDao.deleteByName(categoryName)
+        }
+    }
 
     private fun sortTasks(tasks: List<Task>, sortBy: SortBy): List<Task> {
         return when (sortBy) {
@@ -142,6 +172,9 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun setSortBy(sortBy: SortBy) {
         _sortBy.value = sortBy
+    }
+    fun setFilterByCategory(category: String?) {
+        _filterByCategory.value = category
     }
       fun addTask(task: Task) {
         viewModelScope.launch {
