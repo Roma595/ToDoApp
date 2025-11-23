@@ -10,7 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class CategoryAdapter(
     private val onCategoryClick: (Category) -> Unit,
-    private val onAddNewClick: () -> Unit
+    private val onAddNewClick: () -> Unit,
+    private val onCategoryLongClick: (Category) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val categories = mutableListOf<Category>()
@@ -86,10 +87,12 @@ class CategoryAdapter(
                 onCategoryClick(category)
                 setSelectedCategory(category)
             }
+            itemView.setOnLongClickListener {
+                onCategoryLongClick(category)
+                true
+            }
         }
     }
-
-
     inner class AddCategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind() {
             itemView.setOnClickListener {

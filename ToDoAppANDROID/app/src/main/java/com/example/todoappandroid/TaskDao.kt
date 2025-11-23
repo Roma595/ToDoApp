@@ -17,4 +17,7 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks")
     fun getAllTasks(): LiveData<List<TaskEntity>>
+
+    @Query("DELETE FROM tasks WHERE category = :categoryName")
+    suspend fun deleteTasksByCategory(categoryName: String)
 }

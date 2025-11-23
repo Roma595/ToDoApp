@@ -99,10 +99,17 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             categoryDao.insert(category.toEntity())
         }
     }
-
-    fun removeCategory(category: Category) {
+    fun updateCategory(category: Category) {
         viewModelScope.launch {
-            categoryDao.delete(category.toEntity())
+            categoryDao.update(category.toEntity())
+        }
+    }
+    fun deleteCategoryWithTasks(categoryName: String) {
+        viewModelScope.launch {
+            // Удаляем все задачи с этой категорией
+            taskDao.deleteTasksByCategory(categoryName)
+            // Удаляем саму категорию
+            categoryDao.deleteByName(categoryName)
         }
     }
 
