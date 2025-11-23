@@ -13,7 +13,7 @@ class TaskNotificationReceiver : BroadcastReceiver() {
 
         val notificationManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val notification = NotificationCompat.Builder(context, "task_channel")
+        val notification = NotificationCompat.Builder(context!!, "task_channel")
             .setContentTitle("Напоминание")
             .setContentText(taskTitle)
             .setSmallIcon(android.R.drawable.ic_dialog_info)

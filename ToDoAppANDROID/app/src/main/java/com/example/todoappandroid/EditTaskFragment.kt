@@ -21,7 +21,6 @@ import com.google.android.material.timepicker.TimeFormat
 import yuku.ambilwarna.AmbilWarnaDialog
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 class EditTaskFragment : Fragment() {
@@ -147,13 +146,27 @@ class EditTaskFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        // Форматируем дату напоминания
+                        // ← ШАГ 1: ОТМЕНА старого напоминания (если оно было)
+                        if (taskReminder) {  // Если у старой задачи было напоминание
+                            val alarmManager = requireContext().getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+                            val intent = android.content.Intent(requireContext(), TaskNotificationReceiver::class.java)
+                            val pendingIntent = android.app.PendingIntent.getBroadcast(
+                                requireContext(),
+                                taskId.toInt(),
+                                intent,
+                                android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+                            )
+                            alarmManager.cancel(pendingIntent)
+                        }
+
+                        // ← ШАГ 2: Форматируем новое напоминание
                         val reminderDateTimeString = if (reminderCalendar != null) {
                             SimpleDateFormat("dd MMM yyyy HH:mm", Locale("ru")).format(reminderCalendar!!.time)
                         } else {
                             null
                         }
 
+                        // ← ШАГ 3: Создаём обновлённую задачу
                         val updatedTask = Task(
                             id = taskId,
                             title = title,
@@ -164,7 +177,11 @@ class EditTaskFragment : Fragment() {
                             reminderDateTime = reminderDateTimeString,
                             isCompleted = taskIsCompleted
                         )
+
+                        // ← ШАГ 4: Сохраняем в БД
                         viewModel.updateTask(updatedTask)
+
+                        // ← ШАГ 5: ТОЛЬКО ЗАТЕМ устанавливаем новое напоминание
                         if (reminderCalendar != null) {
                             scheduleTaskNotification(
                                 context = requireContext(),
@@ -173,6 +190,7 @@ class EditTaskFragment : Fragment() {
                                 calendar = reminderCalendar!!
                             )
                         }
+
                         findNavController().navigateUp()
                     }
                     true
@@ -180,6 +198,7 @@ class EditTaskFragment : Fragment() {
                 else -> false
             }
         }
+
     }
     private fun showReminderPickerDialog(reminderEditText: EditText) {
         val calendar = reminderCalendar ?: Calendar.getInstance()

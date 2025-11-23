@@ -58,22 +58,28 @@ class ListFragment : Fragment() {
             override fun onDelete(position: Int) {
                 val task = activeTaskAdapter.currentList.getOrNull(position)
                 if (task != null) {
+                    // ← ДОБАВЬТЕ: Отмена напоминания перед удалением
+                    cancelTaskNotification(requireContext(), task.id.toInt())
                     viewModel.removeTask(task)
                 }
             }
         }
         ItemTouchHelper(activeSwipeCallback).attachToRecyclerView(activeTasksRecyclerView)
 
+
         // Удаление по свайпу для выполненных
         val completedSwipeCallback = object : SwipeCallback(requireContext()) {
             override fun onDelete(position: Int) {
                 val task = completedTaskAdapter.currentList.getOrNull(position)
                 if (task != null) {
+                    // ← ДОБАВЬТЕ: Отмена напоминания перед удалением
+                    cancelTaskNotification(requireContext(), task.id.toInt())
                     viewModel.removeTask(task)
                 }
             }
         }
         ItemTouchHelper(completedSwipeCallback).attachToRecyclerView(completedTasksRecyclerView)
+
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_sort -> {
@@ -117,6 +123,47 @@ class ListFragment : Fragment() {
             }
         }
     }
+    private fun cancelTaskNotification(context: android.content.Context, taskId: Int) {
+        val alarmManager = context.getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+
+        val intent = android.content.Intent(context, TaskNotificationReceiver::class.java).apply {
+            action = "com.example.todoappandroid.TASK_NOTIFICATION"
+            putExtra("taskId", taskId)
+        }
+
+        val pendingIntent = android.app.PendingIntent.getBroadcast(
+            context,
+            taskId,
+            intent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
+        alarmManager.cancel(pendingIntent)
+    }
+
+    private fun deleteTaskWithReminder(task: Task) {
+        if (task.reminder) {
+            val alarmManager = requireContext().getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+
+            val intent = android.content.Intent(requireContext(), TaskNotificationReceiver::class.java).apply {
+                action = "com.example.todoappandroid.TASK_NOTIFICATION"
+                putExtra("taskId", task.id.toInt())
+                putExtra("taskTitle", task.title)
+            }
+
+            val pendingIntent = android.app.PendingIntent.getBroadcast(
+                requireContext(),
+                task.id.toInt(),
+                intent,
+                android.app.PendingIntent.FLAG_CANCEL_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE  // ← ИЗМЕНИТЕ на CANCEL_CURRENT
+            )
+
+            alarmManager.cancel(pendingIntent)
+        }
+
+        viewModel.removeTask(task)
+    }
+
     private fun showSortMenu() {
         val sortOptions = arrayOf(
             "По дате создания",
@@ -175,10 +222,6 @@ class ListFragment : Fragment() {
             }
             .show()
     }
-
-
-
-
     private fun openEditTask(task: Task) {
         val bundle = Bundle().apply {
             putLong("task_id", task.id)
@@ -192,5 +235,4 @@ class ListFragment : Fragment() {
         }
         findNavController().navigate(R.id.action_listFragment_to_editTaskFragment, bundle)
     }
-
 }
