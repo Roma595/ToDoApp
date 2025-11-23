@@ -17,6 +17,14 @@ class CategoryAdapter(
     private val categories = mutableListOf<Category>()
     private var selectedCategory: Category? = null
 
+    fun selectCategory(category: Category) {
+        selectedCategory = category
+        notifyDataSetChanged()
+    }
+    fun clearSelection() {
+        selectedCategory = null
+        notifyDataSetChanged()
+    }
     fun setCategories(newCategories: List<Category>) {
         categories.clear()
         categories.addAll(newCategories)
@@ -27,10 +35,17 @@ class CategoryAdapter(
         selectedCategory = category
         notifyDataSetChanged()
     }
+    fun addCategory(category: Category) {
+        categories.add(category)
+        notifyItemInserted(categories.size - 1)
+    }
 
     override fun getItemViewType(position: Int): Int {
         return if (position == categories.size) 1 else 0  // 1 = добавить категорию, 0 = существующая категория
     }
+
+    override fun getItemCount() = categories.size + 1  // +1 для кнопки добавить
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == 1) {
@@ -55,11 +70,6 @@ class CategoryAdapter(
             }
         }
     }
-    fun addCategory(category: Category) {
-        categories.add(category)
-        notifyItemInserted(categories.size - 1)
-    }
-    override fun getItemCount() = categories.size + 1  // +1 для кнопки добавить
 
     inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val colorView: View = itemView.findViewById(R.id.categoryColorView)
@@ -84,8 +94,15 @@ class CategoryAdapter(
             colorView.background = drawable
 
             itemView.setOnClickListener {
-                onCategoryClick(category)
-                setSelectedCategory(category)
+                if (isSelected) {
+                    // Если уже выбрана - отменяем выбор
+                    clearSelection()
+                    onCategoryClick(Category(name = "", color = ""))
+                } else {
+                    // Если не выбрана - выбираем
+                    selectCategory(category)
+                    onCategoryClick(category)
+                }
             }
             itemView.setOnLongClickListener {
                 onCategoryLongClick(category)

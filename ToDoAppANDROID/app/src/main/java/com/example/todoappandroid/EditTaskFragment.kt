@@ -16,9 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import yuku.ambilwarna.AmbilWarnaDialog
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class EditTaskFragment : Fragment() {
@@ -48,6 +51,7 @@ class EditTaskFragment : Fragment() {
         val dateEditText = view.findViewById<EditText>(R.id.taskDateEditText)
         val descriptionEditText = view.findViewById<EditText>(R.id.taskDescriptionEditText)
         val categoriesRecyclerView = view.findViewById<RecyclerView>(R.id.categoriesRecyclerView)
+        val reminderEditText = view.findViewById<EditText>(R.id.reminderEditText)
 
         //Получаем данные
         val taskId = arguments?.getLong("task_id") ?: -1L
@@ -56,7 +60,12 @@ class EditTaskFragment : Fragment() {
         val taskDate = arguments?.getString("task_date") ?: ""
         val taskCategory = arguments?.getString("task_category") ?: ""
         val taskIsCompleted = arguments?.getBoolean("task_isCompleted") ?: false
+        val taskReminder = arguments?.getBoolean("task_reminder") ?: false
+        val taskReminderDateTime = arguments?.getString("task_reminder_date_time")
 
+        // ← ДОБАВЬТЕ логирование
+        android.util.Log.d("EditTaskFragment", "taskReminder: $taskReminder")
+        android.util.Log.d("EditTaskFragment", "taskReminderDateTime: $taskReminderDateTime")
         // Карусель категорий
         setupCategoryCarousel(categoriesRecyclerView)
 
@@ -65,6 +74,26 @@ class EditTaskFragment : Fragment() {
         descriptionEditText.setText(taskDescription)
         dateEditText.setText(taskDate)
 
+        // Заполняем напоминание если оно есть
+        if (taskReminder && !taskReminderDateTime.isNullOrEmpty()) {
+            try {
+                val format = SimpleDateFormat("dd MMM yyyy HH:mm", Locale("ru"))
+                val parsedDate = format.parse(taskReminderDateTime)
+
+                android.util.Log.d("EditTaskFragment", "Parsed date: $parsedDate")
+                if (parsedDate != null) {
+                    reminderEditText.setText(taskReminderDateTime)
+                    reminderCalendar = Calendar.getInstance().apply {
+                        time = parsedDate
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("EditTaskFragment", "Error parsing reminder date: ${e.message}")
+            }
+
+        } else {
+            android.util.Log.d("EditTaskFragment", "No reminder or empty date time")
+        }
         // Выбираем нужную категорию
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
             categoryAdapter.setCategories(categories)
@@ -79,15 +108,25 @@ class EditTaskFragment : Fragment() {
 
         // Календарь
         dateEditText.setOnClickListener {
+            val today = Calendar.getInstance().timeInMillis
+
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Выберите дату")
+                .setSelection(today)
                 .build()
+
+            datePicker.addOnNegativeButtonClickListener {
+                dateEditText.text.clear()
+            }
             datePicker.addOnPositiveButtonClickListener {
                 dateEditText.setText(datePicker.headerText)
             }
             datePicker.show(parentFragmentManager, "datePicker")
         }
-
+        //Напоминание
+        reminderEditText.setOnClickListener {
+            showReminderPickerDialog(reminderEditText)
+        }
         // Стрелка назад
         topAppBar.setNavigationOnClickListener {
             findNavController().navigateUp()
@@ -108,6 +147,12 @@ class EditTaskFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
+                        // Форматируем дату напоминания
+                        val reminderDateTimeString = if (reminderCalendar != null) {
+                            SimpleDateFormat("dd MMM yyyy HH:mm", Locale("ru")).format(reminderCalendar!!.time)
+                        } else {
+                            null
+                        }
 
                         val updatedTask = Task(
                             id = taskId,
@@ -115,9 +160,19 @@ class EditTaskFragment : Fragment() {
                             description = if (description.isNotEmpty()) description else null,
                             date = if (date.isNotEmpty()) date else null,
                             category = selectedCategory?.name ?: taskCategory,
+                            reminder = reminderCalendar != null,
+                            reminderDateTime = reminderDateTimeString,
                             isCompleted = taskIsCompleted
                         )
                         viewModel.updateTask(updatedTask)
+                        if (reminderCalendar != null) {
+                            scheduleTaskNotification(
+                                context = requireContext(),
+                                taskId = taskId.toInt(),
+                                taskTitle = title,
+                                calendar = reminderCalendar!!
+                            )
+                        }
                         findNavController().navigateUp()
                     }
                     true
@@ -126,13 +181,121 @@ class EditTaskFragment : Fragment() {
             }
         }
     }
+    private fun showReminderPickerDialog(reminderEditText: EditText) {
+        val calendar = reminderCalendar ?: Calendar.getInstance()
+        val now = Calendar.getInstance()
+
+
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Выберите дату напоминания")
+            .setSelection(calendar.timeInMillis)
+            .build()
+
+        datePicker.addOnNegativeButtonClickListener {
+            reminderEditText.text.clear()
+            reminderCalendar = null
+        }
+        datePicker.addOnPositiveButtonClickListener { selectedDate ->
+            // Обновляем календарь с выбранной датой
+            calendar.timeInMillis = selectedDate
+
+            val currentTime = Calendar.getInstance().apply {
+                add(Calendar.MINUTE, 1)
+            }
+
+            val timePicker = MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setHour(currentTime.get(Calendar.HOUR_OF_DAY))
+                .setMinute(currentTime.get(Calendar.MINUTE))
+                .setTitleText("Выберите время напоминания")
+                .build()
+            timePicker.addOnNegativeButtonClickListener {
+                reminderEditText.text.clear()
+                reminderCalendar = null
+            }
+            timePicker.addOnPositiveButtonClickListener {
+                // Обновляем календарь с выбранным временем
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
+                calendar.set(Calendar.MINUTE, timePicker.minute)
+                calendar.set(Calendar.SECOND, 0)
+
+                // Проверяем что время не в прошлом
+
+                if (calendar.timeInMillis <= now.timeInMillis) {
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Напоминание не может быть в прошлом",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+
+                    reminderCalendar = calendar
+                    updateReminderDisplay(reminderEditText)
+                }
+            }
+
+            timePicker.show(parentFragmentManager, "timePicker")
+        }
+
+        datePicker.show(parentFragmentManager, "reminderDatePicker")
+    }
+
+    private fun updateReminderDisplay(reminderEditText: EditText) {
+        if (reminderCalendar != null) {
+            val format = SimpleDateFormat("dd MMM yyyy HH:mm", Locale("ru"))
+            val dateTimeString = format.format(reminderCalendar!!.time)
+            reminderEditText.setText(dateTimeString)
+        }
+    }
+
+    private fun scheduleTaskNotification(
+        context: android.content.Context,
+        taskId: Int,
+        taskTitle: String,
+        calendar: Calendar
+    ) {
+        val alarmManager = context.getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+
+        val intent = android.content.Intent(context, TaskNotificationReceiver::class.java).apply {
+            action = "com.example.todoappandroid.TASK_NOTIFICATION"
+            putExtra("taskTitle", taskTitle)
+            putExtra("taskId", taskId)
+        }
+
+        val pendingIntent = android.app.PendingIntent.getBroadcast(
+            context,
+            taskId,
+            intent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
+        try {
+            alarmManager.setExactAndAllowWhileIdle(
+                android.app.AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                pendingIntent
+            )
+        } catch (e: SecurityException) {
+            alarmManager.setAndAllowWhileIdle(
+                android.app.AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                pendingIntent
+            )
+        }
+    }
 
     // Настройка карусели категорий
     private fun setupCategoryCarousel(recyclerView: RecyclerView) {
         categoryAdapter = CategoryAdapter(
             onCategoryClick = { category ->
-                selectedCategory = category
-                categoryAdapter.setSelectedCategory(category)
+                if (selectedCategory?.name == category.name) {
+                    selectedCategory = null
+                    categoryAdapter.clearSelection()
+                } else {
+                    selectedCategory = category
+                    categoryAdapter.selectCategory(category)
+                }
             },
             onAddNewClick = {
                 showAddCategoryDialog()

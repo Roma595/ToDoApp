@@ -97,13 +97,18 @@ class CreateTaskFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-
+                        val reminderDateTimeString = if (reminderCalendar != null) {
+                            SimpleDateFormat("dd MMM yyyy HH:mm", Locale("ru")).format(reminderCalendar!!.time)
+                        } else {
+                            null
+                        }
                         val newTask = Task(
                             title = title,
                             description = if (description.isNotEmpty()) description else null,
                             date = if (date.isNotEmpty()) date else null,
                             category = selectedCategory?.name,
-                            reminder = false,
+                            reminder = reminderCalendar != null,
+                            reminderDateTime = reminderDateTimeString,
                             isCompleted = false
                         )
 
@@ -145,11 +150,14 @@ class CreateTaskFragment : Fragment() {
             // Обновляем календарь с выбранной датой
             calendar.timeInMillis = selectedDate
 
+            val currentTime = Calendar.getInstance().apply {
+                add(Calendar.MINUTE, 1)
+            }
 
             val timePicker = MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H)
-                .setHour(now.get(Calendar.HOUR_OF_DAY))
-                .setMinute(now.get(Calendar.MINUTE) + 1)
+                .setHour(currentTime.get(Calendar.HOUR_OF_DAY))
+                .setMinute(currentTime.get(Calendar.MINUTE))
                 .setTitleText("Выберите время напоминания")
                 .build()
             timePicker.addOnNegativeButtonClickListener {
@@ -235,7 +243,13 @@ class CreateTaskFragment : Fragment() {
     private fun setupCategoryCarousel(recyclerView: RecyclerView) {
         categoryAdapter = CategoryAdapter(
             onCategoryClick = { category ->
-                selectedCategory = category
+                if (selectedCategory?.name == category.name) {
+                    selectedCategory = null
+                    categoryAdapter.clearSelection()
+                } else {
+                    selectedCategory = category
+                    categoryAdapter.selectCategory(category)
+                }
             },
             onAddNewClick = {
                 showAddCategoryDialog()

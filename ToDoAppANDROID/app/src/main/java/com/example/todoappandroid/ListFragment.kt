@@ -93,6 +93,8 @@ class ListFragment : Fragment() {
             putString("task_date", task.date)
             putString("task_category", task.category)
             putBoolean("task_isCompleted", task.isCompleted)
+            putBoolean("task_reminder", task.reminder)
+            putString("task_reminder_date_time", task.reminderDateTime)
         }
         findNavController().navigate(R.id.action_listFragment_to_editTaskFragment, bundle)
     }
