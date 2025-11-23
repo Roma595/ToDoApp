@@ -32,13 +32,8 @@ struct TaskItemView: View {
                 Spacer()
             }
             .contentShape(Rectangle())
-            .onTapGesture {
-                isEditing = true
-            }
-            .navigationDestination(isPresented: $isEditing){
-                EditTaskView(task: task)
-            }
         }
+
         .padding(.vertical, 6)
     }
     

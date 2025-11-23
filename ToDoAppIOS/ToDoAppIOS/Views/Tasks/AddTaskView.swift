@@ -19,10 +19,11 @@ struct AddTaskView: View {
     
     @State private var taskName: String = ""
     @State private var selectedDate: Date? = nil
-    @State private var notificationDate: Date? = nil
-    @State private var notificationTime: Date? = nil
+    @State private var notificationDateTime: Date? = nil
     @State private var taskCategory: CategoryModel? = nil
     @State private var taskNote: String = ""
+    
+    let notificationMessage: String = "Не забудь выполнить задачу. Скорее посмотри ее!"
     
     @FocusState private var isFocusedText: Bool
     
@@ -64,17 +65,27 @@ struct AddTaskView: View {
                     //MARK: - Notification
                     VStack(alignment: .leading, spacing: 15 ){
                         AddTaskFieldHeaderView(imageName: "bell", headerName: "Напоминание")
-                        Button (action: {
-                            activeSheet = .notification
-                            NotificationManager.shared.schedule(title: "test notification", body: "Тестируем напоминания гы гы", date: Date(timeIntervalSinceNow: 10))
-                        }){
-                            HStack {
-                                Image(systemName: "plus")
-                                Text("Добавить напоминание")
-                            }
-                            .foregroundColor(.blue)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        }.padding(.vertical, 10)
+                        
+                        if let datetime = notificationDateTime {
+                            Text(dateFormatterNotification.string(from: datetime))
+                                            .foregroundColor(.blue)
+                                            .onTapGesture { activeSheet = .notification}
+                                            .frame(maxWidth: .infinity, alignment: .center)
+                                            .padding(10)
+                        }
+                        else{
+                            Button (action: {
+                                activeSheet = .notification
+                            }){
+                                HStack {
+                                    Image(systemName: "plus")
+                                    Text("Добавить напоминание")
+                                }
+                                .foregroundColor(.blue)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            }.padding(.vertical, 10)
+                        }
+                        
                     }
                     
                     //MARK: - Category Scroll
@@ -114,8 +125,8 @@ struct AddTaskView: View {
                         .presentationDetents([.medium])
                         .interactiveDismissDisabled(true)
                 case .notification:
-                    AddNotificationView()
-                        .presentationDetents([.medium])
+                    NotificationDatePickerView(selectedDateTime: $notificationDateTime)
+                        .presentationDetents([.height(500)])
                         .interactiveDismissDisabled(true)
                 case .category:
                     AddCategoryView()
@@ -140,8 +151,12 @@ struct AddTaskView: View {
             showAlert = true
             return
         }
-        let newTask = TaskModel(name: taskName, isCompleted: false, date: selectedDate, category: taskCategory, note: taskNote)
+        let newTask = TaskModel(name: taskName, isCompleted: false, date: selectedDate, notificationDateTime: notificationDateTime, category: taskCategory, note: taskNote)
         modelContext.insert(newTask)
+        
+        if (notificationDateTime != nil){
+            NotificationManager.shared.schedule(title: newTask.name, body: notificationMessage, date: notificationDateTime!, taskId: newTask.id)
+        }
         try_save_context()
     }
     
@@ -149,6 +164,12 @@ struct AddTaskView: View {
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "ru_RU")
             formatter.dateStyle = .long
+            return formatter
+    }
+    private var dateFormatterNotification: DateFormatter {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_RU")
+            formatter.dateFormat = "dd MMMM 'в' HH:mm"
             return formatter
     }
     

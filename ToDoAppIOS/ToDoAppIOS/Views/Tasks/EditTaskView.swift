@@ -19,10 +19,11 @@ struct EditTaskView: View {
     
     @State private var taskName: String
     @State private var selectedDate: Date?
-    @State private var notificationDate: Date?
-    @State private var notificationTime: Date?
+    @State private var notificationDateTime: Date?
     @State private var taskCategory: CategoryModel?
     @State private var taskNote: String
+    
+    let notificationMessage: String = "Не забудь выполнить задачу. Скорее посмотри ее!"
     
     @FocusState private var isFocusedText: Bool
     
@@ -30,6 +31,7 @@ struct EditTaskView: View {
         self.task = task
         self.taskName = task.name
         self.selectedDate = task.date
+        self.notificationDateTime = task.notificationDateTime
         self.taskCategory = task.category
         self.taskNote = task.note ?? ""
     }
@@ -71,17 +73,27 @@ struct EditTaskView: View {
                     //MARK: - Notification
                     VStack(alignment: .leading, spacing: 15 ){
                         AddTaskFieldHeaderView(imageName: "bell", headerName: "Напоминание")
-                        Button (action: {
-                            activeSheet = .notification
-                            NotificationManager.shared.schedule(title: "test notification", body: "Тестируем напоминания гы гы", date: Date(timeIntervalSinceNow: 10))
-                        }){
-                            HStack {
-                                Image(systemName: "plus")
-                                Text("Добавить напоминание")
-                            }
-                            .foregroundColor(.blue)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        }.padding(.vertical, 10)
+                        
+                        if let datetime = notificationDateTime {
+                            Text(dateFormatterNotification.string(from: datetime))
+                                            .foregroundColor(.blue)
+                                            .onTapGesture { activeSheet = .notification}
+                                            .frame(maxWidth: .infinity, alignment: .center)
+                                            .padding(10)
+                        }
+                        else{
+                            Button (action: {
+                                activeSheet = .notification
+                            }){
+                                HStack {
+                                    Image(systemName: "plus")
+                                    Text("Добавить напоминание")
+                                }
+                                .foregroundColor(.blue)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            }.padding(.vertical, 10)
+                        }
+                        
                     }
                     
                     //MARK: - Category Scroll
@@ -113,6 +125,7 @@ struct EditTaskView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
+                        editTask()
                         dismiss()
                     }) {
                         Text("Сохранить")
@@ -127,22 +140,49 @@ struct EditTaskView: View {
                         .presentationDetents([.medium])
                         .interactiveDismissDisabled(true)
                 case .notification:
-                    AddNotificationView()
-                        .presentationDetents([.medium])
+                    NotificationDatePickerView(selectedDateTime: $notificationDateTime)
+                        .presentationDetents([.height(500)])
                         .interactiveDismissDisabled(true)
                 case .category:
                     AddCategoryView()
-                        .presentationDetents([.medium])
+                        .presentationDetents([.height(300)])
                         .interactiveDismissDisabled(true)
                 }
             }
         }
     }
     
+    func editTask() {
+        task.name = taskName
+        task.date = selectedDate
+        task.notificationDateTime = notificationDateTime
+        task.category = taskCategory
+        task.note = taskNote
+        
+        NotificationManager.shared.cancelReminder(for: task.id)
+        NotificationManager.shared.schedule(title: task.name, body: notificationMessage, date: notificationDateTime!, taskId: task.id)
+        try_save_context()
+    }
+    
+    func try_save_context(){
+        do {
+            try modelContext.save()
+        } catch {
+            print("Ошибка сохранения: \(error)")
+        }
+    }
+
     private var dateFormatter: DateFormatter {
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "ru_RU")
             formatter.dateStyle = .long
+            return formatter
+    }
+    
+    private var dateFormatterNotification: DateFormatter {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_RU")
+            formatter.dateFormat = "dd MMMM 'в' HH:mm"
             return formatter
     }
 }

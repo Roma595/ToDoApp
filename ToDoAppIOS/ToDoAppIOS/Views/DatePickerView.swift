@@ -15,28 +15,6 @@ struct DatePickerView: View {
     var body: some View {
         NavigationStack{
             VStack{
-                HStack{
-                    Button(action: {
-                        selectedDate = nil;
-                        dismiss()
-                    }){
-                        Text("Отмена")
-                    }
-                    .padding(.leading, 15)
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                    
-                    Button(action: {
-                        dismiss()
-                    }){
-                        Text("Добавить")
-                    }
-                    .padding(.trailing, 15)
-                    
-                    .frame(maxWidth: .infinity, alignment: .topTrailing)
-                    
-                }
-                .padding(.top, 4)
-                
                 DatePicker(
                     "",
                     selection: Binding(
@@ -47,6 +25,13 @@ struct DatePickerView: View {
                 )
                 .datePickerStyle(.graphical)
                 .environment(\.locale, Locale(identifier: "ru_RU"))
+                .padding()
+                
+                Spacer()
+                
+            }
+            .toolbar{
+                DataPickerViewToolbar(selectedDate: $selectedDate)
             }
 
         }

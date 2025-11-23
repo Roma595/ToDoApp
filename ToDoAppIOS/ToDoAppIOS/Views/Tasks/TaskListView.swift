@@ -23,6 +23,7 @@ struct TaskListView: View {
     @State private var selectedCategory: String = "Все"
     @State private var sortType: SortType = .name
     @State private var ascending: Bool = true
+    @State private var selectedTask: TaskModel? = nil
     
     var categories: [String] {
         let raw = tasks.compactMap { $0.category?.name }
@@ -75,13 +76,18 @@ struct TaskListView: View {
             List{
                 Section(header: Text("Активные задачи")) {
                     ForEach(activeTasks) { task in
-                        TaskItemView(task: task)
+                        NavigationLink(destination: EditTaskView(task: task)){
+                            TaskItemView(task: task)
+                        }
+                        
                     }
                     .onDelete{ indexSet in deleteActiveTasks(at: indexSet)}
                 }.listRowBackground(Color(.systemGray6).opacity(0.7))
                 Section(header: Text("Выполненные задачи")) {
                     ForEach(completedTasks) { task in
-                        TaskItemView(task: task)
+                        NavigationLink(destination: EditTaskView(task: task)){
+                            TaskItemView(task: task)
+                        }
                     }
                     .onDelete { indexSet in deleteCompletedTasks(at: indexSet)}
                 }.listRowBackground(Color(.systemGray6).opacity(0.7))
@@ -93,6 +99,7 @@ struct TaskListView: View {
     func deleteActiveTasks(at offsets: IndexSet) {
         for index in offsets {
             let task = activeTasks[index]
+            NotificationManager.shared.cancelReminder(for: task.id)
             modelContext.delete(task)
         }
     }
@@ -101,6 +108,7 @@ struct TaskListView: View {
     func deleteCompletedTasks(at offsets: IndexSet) {
         for index in offsets {
             let task = completedTasks[index]
+            NotificationManager.shared.cancelReminder(for: task.id)
             modelContext.delete(task)
         }
     }

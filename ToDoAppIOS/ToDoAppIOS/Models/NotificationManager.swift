@@ -36,15 +36,28 @@ class NotificationManager {
     }
 
     // Создаёт напоминание
-    func schedule(title: String, body: String, date: Date, repeats: Bool = false, completion: ((Error?) -> Void)? = nil) {
+    func schedule(title: String, body: String, date: Date, taskId: String, repeats: Bool = false, completion: ((Error?) -> Void)? = nil) {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
+        
+        content.userInfo = ["taskId": taskId]
 
         let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: repeats)
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(request, withCompletionHandler: completion)
+    }
+    
+    // Удаляет напоминание по id задачи
+    func cancelReminder(for taskId: String) {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            let idsToRemove = requests
+                .filter { $0.content.userInfo["taskId"] as? String == taskId }
+                .map { $0.identifier }
+            
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: idsToRemove)
+        }
     }
 }

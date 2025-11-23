@@ -78,6 +78,7 @@ struct CategoryScrollView: View {
         let relatedTasks = tasks.filter { $0.category == selectedCategory }
         
         for task in relatedTasks {
+            NotificationManager.shared.cancelReminder(for: task.id)
             modelContext.delete(task)
         }
         
