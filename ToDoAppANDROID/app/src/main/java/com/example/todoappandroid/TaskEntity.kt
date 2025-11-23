@@ -12,6 +12,7 @@ data class TaskEntity(
     val date: String? = null,
     val category: String? = null,
     val reminder: Boolean = false,
+    val reminderDateTime: String? = null,
     val isCompleted: Boolean = false
 )
 // Функция для преобразования Entity в Model
@@ -22,6 +23,7 @@ fun TaskEntity.toTask() = Task(
     date = date,
     category = category,
     reminder = reminder,
+    reminderDateTime = reminderDateTime,
     isCompleted = isCompleted
 )
 
@@ -33,5 +35,6 @@ fun Task.toEntity() = TaskEntity(
     date = date,
     category = category,
     reminder = reminder,
+    reminderDateTime = reminderDateTime,
     isCompleted = isCompleted
 )

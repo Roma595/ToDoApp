@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="40dp">
+    android:layout_marginTop="0dp">
     android:orientation="vertical">
 
     <!-- TopAppBar с двумя иконками -->
@@ -59,9 +59,9 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:hint="Дата"
-        app:boxBackgroundMode="outline"
-        android:layout_marginBottom="16dp">
+        app:boxBackgroundMode="outline">
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -81,13 +81,13 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:hint="Описание"
-        app:boxBackgroundMode="outline"
-        android:layout_marginBottom="16dp">
+        app:boxBackgroundMode="outline">
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Переключатель напоминания -->
+
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/taskDescriptionEditText"
         android:layout_width="match_parent"
@@ -116,7 +116,7 @@
         tools:listitem="@layout/item_category" />
 
 
-    <!-- Напоминание - одно поле -->
+    <!-- Напоминание -->
 
     <EditText
         android:id="@+id/reminderEditText"

@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import yuku.ambilwarna.AmbilWarnaDialog
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class EditTaskFragment : Fragment() {
 
@@ -24,7 +27,7 @@ class EditTaskFragment : Fragment() {
     private var selectedCategory: Category? = null
     private val viewModel: TaskViewModel by activityViewModels()
     private var selectedColor: Int = Color.parseColor("#ED9121")
-
+    private var reminderCalendar: Calendar? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

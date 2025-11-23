@@ -7,6 +7,7 @@ data class Task(
     val date: String? = null,
     val category: String? = null,
     val reminder: Boolean = false,
+    val reminderDateTime: String? = null,
     val isCompleted: Boolean = false
 )
 

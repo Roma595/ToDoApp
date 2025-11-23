@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="40dp">
+    android:layout_marginTop="0dp">
     android:orientation="vertical">
 
     <!-- TopAppBar с двумя иконками -->
@@ -57,9 +57,9 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:hint="Дата"
-        app:boxBackgroundMode="outline"
-        android:layout_marginBottom="16dp">
+        app:boxBackgroundMode="outline">
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -79,9 +79,9 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:hint="Описание"
-        app:boxBackgroundMode="outline"
-        android:layout_marginBottom="16dp">
+        app:boxBackgroundMode="outline">
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -100,31 +100,31 @@
         tools:text="Описание задачи" />
 
     <!-- Карусель категорий -->
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/taskReminder"
-        android:layout_width="395dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:fontFamily="sans-serif"
-        android:text="Добавить напоминание"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/taskDateEditText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoriesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/taskReminder"
+        tools:layout_editor_absoluteY="305dp"
         tools:listitem="@layout/item_category" />
+
+    <!-- Напоминание -->
+
+    <EditText
+        android:id="@+id/reminderEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="8dp"
+        android:focusable="false"
+        android:hint="Добавить напоминание"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/taskDateEditText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

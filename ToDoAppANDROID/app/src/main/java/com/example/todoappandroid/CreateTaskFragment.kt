@@ -19,6 +19,9 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import yuku.ambilwarna.AmbilWarnaDialog
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class CreateTaskFragment : Fragment() {
 
@@ -26,9 +29,7 @@ class CreateTaskFragment : Fragment() {
     private var selectedCategory: Category? = null
     private val viewModel: TaskViewModel by activityViewModels()
     private var selectedColor: Int = Color.parseColor("#ED9121")
-
-    private var reminderDate: String? = null
-    private var reminderTime: String? = null
+    private var reminderCalendar: Calendar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,13 +58,24 @@ class CreateTaskFragment : Fragment() {
 
         // Календарь
         dateEditText.setOnClickListener {
+
+            val today = Calendar.getInstance().timeInMillis
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Выберите дату")
+                .setSelection(today)
                 .build()
+
             datePicker.addOnPositiveButtonClickListener {
                 dateEditText.setText(datePicker.headerText)
             }
+            datePicker.addOnNegativeButtonClickListener {
+                dateEditText.text.clear()
+            }
             datePicker.show(parentFragmentManager, "datePicker")
+        }
+        // Окошко для выбора напоминания
+        reminderEditText.setOnClickListener {
+            showReminderPickerDialog(reminderEditText)
         }
         // Стрелка назад
         topAppBar.setNavigationOnClickListener {
@@ -96,6 +108,16 @@ class CreateTaskFragment : Fragment() {
                         )
 
                         viewModel.addTask(newTask)
+                        // Если напоминание выбрано, установить AlarmManager
+                        if (reminderCalendar != null) {
+                            val taskId = System.currentTimeMillis().toInt()
+                            scheduleTaskNotification(
+                                context = requireContext(),
+                                taskId = taskId,
+                                taskTitle = title,
+                                calendar = reminderCalendar!!
+                            )
+                        }
                         findNavController().navigateUp()
                     }
                     true
@@ -105,6 +127,110 @@ class CreateTaskFragment : Fragment() {
         }
     }
 
+    private fun showReminderPickerDialog(reminderEditText: EditText) {
+        val calendar = reminderCalendar ?: Calendar.getInstance()
+        val now = Calendar.getInstance()
+
+
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Выберите дату напоминания")
+            .setSelection(calendar.timeInMillis)
+            .build()
+
+        datePicker.addOnNegativeButtonClickListener {
+            reminderEditText.text.clear()
+            reminderCalendar = null
+        }
+        datePicker.addOnPositiveButtonClickListener { selectedDate ->
+            // Обновляем календарь с выбранной датой
+            calendar.timeInMillis = selectedDate
+
+
+            val timePicker = MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setHour(now.get(Calendar.HOUR_OF_DAY))
+                .setMinute(now.get(Calendar.MINUTE) + 1)
+                .setTitleText("Выберите время напоминания")
+                .build()
+            timePicker.addOnNegativeButtonClickListener {
+                reminderEditText.text.clear()
+                reminderCalendar = null
+            }
+            timePicker.addOnPositiveButtonClickListener {
+                // Обновляем календарь с выбранным временем
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
+                calendar.set(Calendar.MINUTE, timePicker.minute)
+                calendar.set(Calendar.SECOND, 0)
+
+                // Проверяем что время не в прошлом
+
+                if (calendar.timeInMillis <= now.timeInMillis) {
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Напоминание не может быть в прошлом",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+
+                    reminderCalendar = calendar
+                    updateReminderDisplay()
+                }
+            }
+
+            timePicker.show(parentFragmentManager, "timePicker")
+        }
+
+        datePicker.show(parentFragmentManager, "reminderDatePicker")
+    }
+
+
+    // Обновляет отображение выбранной даты и времени
+    private fun updateReminderDisplay() {
+        val view = view ?: return
+        val reminderEditText = view.findViewById<EditText>(R.id.reminderEditText)
+
+        if (reminderCalendar != null) {
+            val format = SimpleDateFormat("dd MMM yyyy HH:mm", Locale("ru"))
+            val dateTimeString = format.format(reminderCalendar!!.time)
+            reminderEditText.setText(dateTimeString)
+        }
+    }
+    private fun scheduleTaskNotification(
+        context: android.content.Context,
+        taskId: Int,
+        taskTitle: String,
+        calendar: Calendar
+    ) {
+        val alarmManager = context.getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+
+        val intent = android.content.Intent(context, TaskNotificationReceiver::class.java).apply {
+            action = "com.example.todoappandroid.TASK_NOTIFICATION"
+            putExtra("taskTitle", taskTitle)
+            putExtra("taskId", taskId)
+        }
+
+        val pendingIntent = android.app.PendingIntent.getBroadcast(
+            context,
+            taskId,
+            intent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
+        try {
+            alarmManager.setExactAndAllowWhileIdle(
+                android.app.AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                pendingIntent
+            )
+        } catch (e: SecurityException) {
+            alarmManager.setAndAllowWhileIdle(
+                android.app.AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                pendingIntent
+            )
+        }
+    }
     // Настройка карусели категорий
     private fun setupCategoryCarousel(recyclerView: RecyclerView) {
         categoryAdapter = CategoryAdapter(
