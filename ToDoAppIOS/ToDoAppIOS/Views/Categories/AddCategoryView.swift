@@ -17,7 +17,8 @@ struct AddCategoryView: View {
     @State private var categoryName:String = ""
     @State private var selectedColor:Color = .black
     
-    @State private var showAlert = false
+    @State private var showEmptyNameAlert = false
+    @State private var showDuplicateNameAlert = false
     
     var body: some View {
         NavigationStack{
@@ -29,28 +30,30 @@ struct AddCategoryView: View {
                 ColorPicker("Цвет", selection: $selectedColor)
                     .font(.title2)
                     .padding(.horizontal)
-
-//                        .alert("Не все поля заполнены", isPresented: $showAlert) {
-//                    Button("Ок", role: .cancel) { }
-//                } message: {
-//                    Text("Введите название категории")
-//                }
-                
             }
             .toolbar{
-                AddCategoryViewToolbar(add_new_category: add_new_category)
+                AddCategoryViewToolbar(add_new_category: add_new_category, showEmptyNameAlert: $showEmptyNameAlert, showDuplicateNameAlert: $showDuplicateNameAlert)
             }
+            
         }
         
         
     }
     
     func add_new_category(){
-//        if categoryName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-//            showAlert = true
-//            return
-//        }
-        let newCategory = CategoryModel(name: categoryName, color: selectedColor)
+        let trimmedName = categoryName.trimmingCharacters(in: .whitespaces)
+        
+        if trimmedName.isEmpty {
+            showEmptyNameAlert = true
+            return
+        }
+        
+        if categories.contains(where: { $0.name.lowercased() == trimmedName.lowercased() }) {
+            showDuplicateNameAlert = true
+            return
+        }
+        
+        let newCategory = CategoryModel(name: trimmedName, color: selectedColor)
         modelContext.insert(newCategory)
         try_save_context()
     }
