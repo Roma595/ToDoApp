@@ -54,6 +54,7 @@ dependencies {
     implementation ("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("com.github.yukuku:ambilwarna:2.0.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     // Room
     implementation("androidx.room:room-runtime:2.6.1")

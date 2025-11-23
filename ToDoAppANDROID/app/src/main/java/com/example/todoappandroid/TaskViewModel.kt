@@ -3,6 +3,7 @@ package com.example.todoappandroid
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
@@ -12,7 +13,14 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     private val taskDao = db.taskDao()
     private val categoryDao = db.categoryDao()
 
+    enum class SortBy {
+        BY_CREATION,           // без сортировки
+        ALPHABETICAL,   // по алфавиту
+        BY_DATE         // по дате
+    }
     // Все задачи из БД
+    private val _sortBy = MutableLiveData(SortBy.BY_CREATION)
+    val sortBy: LiveData<SortBy> = _sortBy
     private val allTasksFromDb: LiveData<List<TaskEntity>> = taskDao.getAllTasks()
 
     // Преобразуем в Model
@@ -29,7 +37,57 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             allTasksFromDb.removeObserver(observer)
         }
     }
-    val tasks: LiveData<List<Task>> = _tasks
+        val sortedTasks: LiveData<List<Task>> = object : LiveData<List<Task>>() {
+        private val tasksObserver = androidx.lifecycle.Observer<List<Task>> { allTasks ->
+            updateSortedTasks(allTasks)
+        }
+
+        private val sortObserver = androidx.lifecycle.Observer<SortBy> { _ ->
+            _tasks.value?.let { updateSortedTasks(it) }
+        }
+
+        private fun updateSortedTasks(tasks: List<Task>) {
+            value = sortTasks(tasks, _sortBy.value ?: SortBy.BY_CREATION)
+        }
+
+        override fun onActive() {
+            _tasks.observeForever(tasksObserver)
+            _sortBy.observeForever(sortObserver)
+        }
+
+        override fun onInactive() {
+            _tasks.removeObserver(tasksObserver)
+            _sortBy.removeObserver(sortObserver)
+        }
+
+    }
+    val sortedActiveTasks: LiveData<List<Task>> = object : LiveData<List<Task>>() {
+        private val observer = androidx.lifecycle.Observer<List<Task>> { allTasks ->
+            value = allTasks.filter { !it.isCompleted }
+        }
+
+        override fun onActive() {
+            sortedTasks.observeForever(observer)
+        }
+
+        override fun onInactive() {
+            sortedTasks.removeObserver(observer)
+        }
+    }
+
+    val sortedCompletedTasks: LiveData<List<Task>> = object : LiveData<List<Task>>() {
+        private val observer = androidx.lifecycle.Observer<List<Task>> { allTasks ->
+            value = allTasks.filter { it.isCompleted }
+        }
+
+        override fun onActive() {
+            sortedTasks.observeForever(observer)
+        }
+
+        override fun onInactive() {
+            sortedTasks.removeObserver(observer)
+        }
+    }
 
     // Активные и выполненные
     val activeTasks: LiveData<List<Task>> = object : LiveData<List<Task>>() {
@@ -75,6 +133,16 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun sortTasks(tasks: List<Task>, sortBy: SortBy): List<Task> {
+        return when (sortBy) {
+            SortBy.ALPHABETICAL -> tasks.sortedBy { it.title }  // По алфавиту A-Z
+            SortBy.BY_DATE -> tasks.sortedBy { it.date ?: "" }  // По дате (пустые вперёд)
+            SortBy.BY_CREATION -> tasks                                 // Без сортировки
+        }
+    }
+    fun setSortBy(sortBy: SortBy) {
+        _sortBy.value = sortBy
+    }
       fun addTask(task: Task) {
         viewModelScope.launch {
             taskDao.insert(task.toEntity())

@@ -1,6 +1,6 @@
 package com.example.todoappandroid
 
-
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 
 
@@ -20,6 +21,7 @@ class ListFragment : Fragment() {
     private lateinit var activeTaskAdapter: TaskAdapter
     private lateinit var completedTaskAdapter: TaskAdapter
     private lateinit var createTaskButton: MaterialButton
+    private lateinit var topAppBar: MaterialToolbar
     private val viewModel: TaskViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -36,7 +38,7 @@ class ListFragment : Fragment() {
         activeTasksRecyclerView = view.findViewById(R.id.activeTasksRecyclerView)
         completedTasksRecyclerView = view.findViewById(R.id.completedTasksRecyclerView)
         createTaskButton = view.findViewById(R.id.createTaskButton)
-
+        topAppBar = view.findViewById(R.id.topAppBar)
         activeTaskAdapter = TaskAdapter(
             onTaskToggle = { task -> viewModel.updateTask(task) },
             onTaskClick = { task -> openEditTask(task) }
@@ -70,13 +72,21 @@ class ListFragment : Fragment() {
             }
         }
         ItemTouchHelper(completedSwipeCallback).attachToRecyclerView(completedTasksRecyclerView)
+        topAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_sort -> {
+                    showSortMenu()
+                    true
+                }
+                else -> false
+            }
+        }
 
-
-        viewModel.activeTasks.observe(viewLifecycleOwner) { tasks ->
+        viewModel.sortedActiveTasks.observe(viewLifecycleOwner) { tasks ->
             activeTaskAdapter.submitList(tasks)
         }
 
-        viewModel.completedTasks.observe(viewLifecycleOwner) { tasks ->
+        viewModel.sortedCompletedTasks.observe(viewLifecycleOwner) { tasks ->
             completedTaskAdapter.submitList(tasks)
         }
 
@@ -85,6 +95,27 @@ class ListFragment : Fragment() {
             findNavController().navigate(R.id.action_listFragment_to_createTaskFragment)
         }
     }
+    private fun showSortMenu() {
+        val sortOptions = arrayOf(
+            "По дате создания",
+            "По алфавиту (A-Я)",
+            "По дате выполнения"
+        )
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Сортировка задач")
+            .setItems(sortOptions) { _, which ->
+                val sortBy = when (which) {
+                    0 -> TaskViewModel.SortBy.BY_CREATION
+                    1 -> TaskViewModel.SortBy.ALPHABETICAL
+                    2 -> TaskViewModel.SortBy.BY_DATE
+                    else -> TaskViewModel.SortBy.BY_CREATION
+                }
+                viewModel.setSortBy(sortBy)
+            }
+            .show()
+    }
+
     private fun openEditTask(task: Task) {
         val bundle = Bundle().apply {
             putLong("task_id", task.id)
