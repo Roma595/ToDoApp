@@ -11,3 +11,8 @@ enum AddToDoSheet: Identifiable{
     var id: Int {hashValue}
     case date, notification, category
 }
+
+enum CategorySheet: Identifiable{
+    var id: Int {hashValue}
+    case edit, delete
+}

@@ -12,6 +12,7 @@ struct CategoryScrollView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \CategoryModel.name) private var categories: [CategoryModel]
+    @Query(sort: \TaskModel.name) private var tasks: [TaskModel]
     
     @Binding var activeSheet: AddToDoSheet?
     @Binding var selectedCategory: CategoryModel?
@@ -25,8 +26,8 @@ struct CategoryScrollView: View {
                         CategoryCircleItemView(
                             category: category,
                             isSelected: selectedCategory?.name == category.name,
-                            onTap: {tap_on_item(index: index)}
-                            
+                            onTap: {tap_on_item(index: index)},
+                            onDelete: {delete_item(index: index)}
                         )
                         .padding(.vertical, 6)
                         Text(category.name)
@@ -70,6 +71,18 @@ struct CategoryScrollView: View {
             let reversedCategories = Array(categories.enumerated())
             selectedCategory = reversedCategories[index].element
         }
+    }
+    
+    func delete_item(index: Int){
+        selectedCategory = Array(categories.enumerated())[index].element
+        let relatedTasks = tasks.filter { $0.category == selectedCategory }
+        
+        for task in relatedTasks {
+            modelContext.delete(task)
+        }
+        
+        modelContext.delete(selectedCategory!)
+        try_save_context()
     }
 
 }

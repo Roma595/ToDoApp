@@ -1,17 +1,15 @@
 //
-//  AddCategoryViewToolbar.swift
+//  EditCategoryViewToolbar.swift
 //  ToDoAppIOS
 //
-//  Created by Рома Котков on 09.10.2025.
+//  Created by Рома Котков on 23.11.2025.
 //
 
 import SwiftUI
 
-struct AddCategoryViewToolbar: ToolbarContent {
+struct EditCategoryViewToolbar: ToolbarContent {
     @Environment(\.dismiss) var dismiss
-    
-    let add_new_category: () -> Void
-//    let showAlert: Bool
+    let editCategory: () -> Void
     
     var body: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
@@ -23,9 +21,8 @@ struct AddCategoryViewToolbar: ToolbarContent {
         }
         ToolbarItem(placement: .navigationBarTrailing) {
             Button(action: {
-                add_new_category()
+                editCategory()
                 dismiss()
-                
             }) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.title2)

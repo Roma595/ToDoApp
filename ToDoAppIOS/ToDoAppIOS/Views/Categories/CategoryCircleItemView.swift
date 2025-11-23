@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct CategoryCircleItemView: View {
+    @Environment(\.dismiss) var dismiss
     let category: CategoryModel
     let isSelected: Bool
     let onTap: () -> Void
+    let onDelete:() -> Void
+    
+    @State private var activeSheet: CategorySheet?
     
     @State private var showMenu = false
+    @State private var showDeleteAlert = false
     var body: some View {
         Circle()
             .fill(category.color)
@@ -30,10 +35,29 @@ struct CategoryCircleItemView: View {
                 showMenu = true
             }
             .confirmationDialog("Действия с категорией", isPresented: $showMenu) {
-                Button("Редактировать") { }
-                Button("Удалить", role: .destructive) { }
+                Button("Редактировать") {activeSheet = .edit}
+                Button("Удалить", role: .destructive) { showDeleteAlert = true}
                 Button("Отмена", role: .cancel) { }
             }
+            .sheet(item: $activeSheet) {sheet in
+                switch sheet {
+                case .edit:
+                    EditCategoryView(category: category)
+                        .presentationDetents([.height(300)])
+                        .interactiveDismissDisabled(true)
+                case .delete:
+                    EditCategoryView(category: category)
+                        .presentationDetents([.height(300)])
+                        .interactiveDismissDisabled(true)
+                }
+            }
+            .alert("Все связанные задачи с этой категорией будут удалены", isPresented: $showDeleteAlert) {
+                Button("Ок", role: .destructive) {onDelete()}
+                Button("Отмена", role: .cancel) { }
+            } message: {
+                Text("Вы уверены?")
+            }
     }
+
 }
 

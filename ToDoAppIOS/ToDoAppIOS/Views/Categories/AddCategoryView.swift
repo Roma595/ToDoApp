@@ -29,24 +29,7 @@ struct AddCategoryView: View {
                 ColorPicker("Цвет", selection: $selectedColor)
                     .font(.title2)
                     .padding(.horizontal)
-                
-                Button(action: {
-                    add_new_category()
-                    if (!showAlert){
-                        dismiss()
-                    }
-                }) {
-                    Rectangle()
-                        .fill(.white)
-                        .frame(width: 200, height: 50)
-                        .cornerRadius(25)
-                        .overlay(
-                            Text("Добавить категорию")
-                                .font(.headline)
-                        )
-                        .shadow(color: Color.black.opacity(0.15), radius: 3, x: 0, y: 2)
-                    
-                }
+
 //                        .alert("Не все поля заполнены", isPresented: $showAlert) {
 //                    Button("Ок", role: .cancel) { }
 //                } message: {
@@ -55,7 +38,7 @@ struct AddCategoryView: View {
                 
             }
             .toolbar{
-                AddCategoryViewToolbar()
+                AddCategoryViewToolbar(add_new_category: add_new_category)
             }
         }
         
