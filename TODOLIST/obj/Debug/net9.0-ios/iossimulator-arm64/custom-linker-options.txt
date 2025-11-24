@@ -5,7 +5,7 @@ AreAnyAssembliesTrimmed=false
 				AOTOutputDirectory=obj/Debug/net9.0-ios/iossimulator-arm64/nativelibraries/aot-output/
 				DedupAssembly=
 				AppBundleManifestPath=bin/Debug/net9.0-ios/iossimulator-arm64/TODOLIST.app/Info.plist
-				CacheDirectory=/Users/romakotkov/Downloads/TODOLIST 2/obj/Debug/net9.0-ios/iossimulator-arm64/linker-cache
+				CacheDirectory=/Users/romakotkov/Учеба/ToDoAppNET/ToDoApp/TODOLIST/obj/Debug/net9.0-ios/iossimulator-arm64/linker-cache
 				
 				Debug=true
 				DeploymentTarget=15.0
@@ -185,7 +185,7 @@ FrameworkAssembly=System.Private.CoreLib
 				IntermediateLinkDir=obj/Debug/net9.0-ios/iossimulator-arm64/linked/
 				InvariantGlobalization=false
 				HybridGlobalization=true
-				ItemsDirectory=/Users/romakotkov/Downloads/TODOLIST 2/obj/Debug/net9.0-ios/iossimulator-arm64/linker-items
+				ItemsDirectory=/Users/romakotkov/Учеба/ToDoAppNET/ToDoApp/TODOLIST/obj/Debug/net9.0-ios/iossimulator-arm64/linker-items
 				IsAppExtension=false
 				IsSimulatorBuild=True
 				LibMonoLinkMode=dylib

@@ -18492,11 +18492,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/romakotkov/Downloads/TODOLIST 2/TODOLIST.csproj",
+      "projectUniqueName": "/Users/romakotkov/Учеба/ToDoAppNET/ToDoApp/TODOLIST/TODOLIST.csproj",
       "projectName": "TODOLIST",
-      "projectPath": "/Users/romakotkov/Downloads/TODOLIST 2/TODOLIST.csproj",
+      "projectPath": "/Users/romakotkov/Учеба/ToDoAppNET/ToDoApp/TODOLIST/TODOLIST.csproj",
       "packagesPath": "/Users/romakotkov/.nuget/packages/",
-      "outputPath": "/Users/romakotkov/Downloads/TODOLIST 2/obj/",
+      "outputPath": "/Users/romakotkov/Учеба/ToDoAppNET/ToDoApp/TODOLIST/obj/",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "configFilePaths": [
