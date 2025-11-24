@@ -9,7 +9,16 @@ import SwiftUI
 
 struct EmptyTasksView: View {
     var body: some View {
-        Text("У вас нет задач. Скорее добавьте свою первую задачу!")
+        VStack {
+            Image(systemName: "checkmark.circle")
+                .font(.system(size: 40))
+                .foregroundColor(.gray)
+
+            Text("Нет задач на этот день")
+                .foregroundColor(.gray)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
     }
 }
 

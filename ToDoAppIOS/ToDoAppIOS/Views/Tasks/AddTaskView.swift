@@ -115,7 +115,7 @@ struct AddTaskView: View {
             //MARK: - Toolbar
             .padding(12)
             .toolbar {
-                AddTaskToolbar(showAlert: $showAlert, add_new_task: {add_new_task()})
+                AddTaskToolbar(showAlert: $showAlert, add_new_task: add_new_task)
             }
             //MARK: - Sheet
             .sheet(item: $activeSheet) {sheet in

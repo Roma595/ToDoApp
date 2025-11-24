@@ -14,40 +14,42 @@ struct CalendarView: View {
     
     @State private var selectedDate = Date()
     
+    var filteredTasks: [TaskModel] {
+        tasks.filter { task in
+            Calendar.current.isDate(task.date!, inSameDayAs: selectedDate) && !task.isCompleted}
+                .sorted { $0.date! < $1.date! }
+    }
+    
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Календарь")
-                .font(.title2)
-                .fontWeight(.bold)
-                .padding()
-            
-            // DatePicker с графическим стилем
-            VStack {
-                DatePicker(
-                    "Выберите дату",
-                    selection: $selectedDate,
-                    displayedComponents: [.date]
-                )
-                .datePickerStyle(.graphical)
-                .padding()
-            }
+        NavigationStack {
+                // MARK: - Calendar
+            DatePicker(
+                "Выберите дату",
+                selection: $selectedDate,
+                displayedComponents: [.date]
+            )
+            .navigationTitle(Text("Календарь"))
+            .navigationBarTitleDisplayMode(.inline)
+            .environment(\.locale, Locale(identifier: "ru_RU"))
+            .datePickerStyle(.graphical)
+            .padding()
             .background(Color(.systemGray6))
             .cornerRadius(12)
             .padding()
             
-            // Количество задач на выбранный день
+            // MARK: - Количество задач на выбранный день
             HStack {
                 Text("Задачи")
                     .font(.headline)
                 
                 Spacer()
                 
-                if tasksForDay(selectedDate).count > 0 {
+                if filteredTasks.count > 0 {
                     Circle()
                         .fill(Color.blue)
                         .frame(width: 24, height: 24)
                         .overlay(
-                            Text("\(tasksForDay(selectedDate).count)")
+                            Text("\(filteredTasks.count)")
                                 .font(.caption2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
@@ -55,79 +57,33 @@ struct CalendarView: View {
                 }
             }
             .padding(.horizontal)
+            .padding(.vertical, 8)
             
-            // Список задач на выбранный день
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(tasks) { task in
-                        if task.date == selectedDate {
-                            TaskRowForCalendar(task: task)
-                        }
-                    }
+            // MARK: - Список задач
+            if filteredTasks.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "checkmark.circle")
+                        .font(.system(size: 40))
+                        .foregroundColor(.gray)
                     
-                    if tasksForDay(selectedDate).isEmpty {
-                        VStack {
-                            Image(systemName: "checkmark.circle")
-                                .font(.system(size: 40))
-                                .foregroundColor(.gray)
-                            
-                            Text("Нет задач на этот день")
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                    }
-                }
-                .padding()
-            }
-            
-            Spacer()
-        }
-        .background(Color(.systemBackground))
-    }
-    
-    private func tasksForDay(_ date: Date) -> [TaskModel] {
-        tasks.filter { Calendar.current.isDate($0.date!, inSameDayAs: date) }
-            .sorted { $0.date! < $1.date! }
-    }
-}
-
-struct TaskRowForCalendar: View {
-    let task: TaskModel
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: task.isCompleted ? "checkmark.square.fill" : "square")
-                .foregroundColor(task.isCompleted ? .green : .gray)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(task.name)
-                    .font(.body)
-                    .fontWeight(.semibold)
-                    .strikethrough(task.isCompleted)
-                
-                if let category = task.category {
-                    Text(category.name)
-                        .font(.caption)
+                    Text("Нет задач на этот день")
                         .foregroundColor(.gray)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    ForEach(filteredTasks) { task in
+                        NavigationLink(destination: EditTaskView(task: task)){
+                            TaskItemView(task: task)
+                        }
+                    }
+                }
+                .listStyle(.plain)
             }
+                
             
-            Spacer()
-            
-            Text(timeFormatter(task.date!))
-                .font(.caption)
-                .foregroundColor(.gray)
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(8)
-    }
-    
-    func timeFormatter(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: date)
+        .background(Color(.systemBackground))
     }
 }
 

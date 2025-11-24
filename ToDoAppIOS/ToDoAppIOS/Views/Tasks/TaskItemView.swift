@@ -9,7 +9,6 @@ import SwiftUI
 
 struct TaskItemView: View {
     let task: TaskModel
-    @State var isEditing: Bool = false
     var body: some View {
         HStack {
             Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")

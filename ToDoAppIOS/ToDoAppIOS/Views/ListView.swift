@@ -15,33 +15,35 @@ struct ListView: View {
     @State var showAddView: Bool = false
     
     var body: some View {
-        Text("Список задач")
-            .font(.title2)
-            .fontWeight(.bold)
-            .padding()
         NavigationStack{
             if (tasks.isEmpty ){
                 EmptyTasksView()
-                .toolbar{
-                    ListViewToolbar(showAddView: $showAddView)
-                }
-                .sheet(isPresented: $showAddView) {
-                    AddTaskView()
-                        .interactiveDismissDisabled(true)
-                }
+                    .toolbar{
+                        ListViewToolbar(showAddView: $showAddView)
+                            
+                    }
+                    .navigationTitle(Text("Список задач"))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .sheet(isPresented: $showAddView) {
+                        AddTaskView()
+                            .interactiveDismissDisabled(true)
+                    }
             }
             else{
                 TaskListView()
+                    .toolbar{
+                        ListViewToolbar(showAddView: $showAddView)
+                    }
+                    .navigationTitle(Text("Список задач"))
+                    .navigationBarTitleDisplayMode(.inline)
+                    //.navigationTitle(Text("Список задач"))
+                    .sheet(isPresented: $showAddView) {
+                        AddTaskView()
+                            .interactiveDismissDisabled(true)
+                    }
                 //.navigationTitle(Text("Список задач"))
-                .toolbar{
-                    ListViewToolbar(showAddView: $showAddView)
-                }
-                .sheet(isPresented: $showAddView) {
-                    AddTaskView()
-                        .interactiveDismissDisabled(true)
-                }
-                    
             }
+            
             
         }
     }

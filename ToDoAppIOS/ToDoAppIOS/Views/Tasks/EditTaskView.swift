@@ -160,7 +160,9 @@ struct EditTaskView: View {
         task.note = taskNote
         
         NotificationManager.shared.cancelReminder(for: task.id)
-        NotificationManager.shared.schedule(title: task.name, body: notificationMessage, date: notificationDateTime!, taskId: task.id)
+        if (notificationDateTime != nil){
+            NotificationManager.shared.schedule(title: task.name, body: notificationMessage, date: notificationDateTime!, taskId: task.id)
+        }
         try_save_context()
     }
     
