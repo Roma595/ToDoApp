@@ -1,7 +1,7 @@
 package com.example.todoappandroid
 
 data class Task(
-    val id: Int = System.currentTimeMillis().toInt(),
+    val id: Long = System.currentTimeMillis(),
     val title: String,
     val description: String? = null,
     val date: String? = null,

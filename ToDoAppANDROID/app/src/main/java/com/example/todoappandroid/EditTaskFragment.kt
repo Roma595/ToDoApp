@@ -168,7 +168,7 @@ class EditTaskFragment : Fragment() {
 
                         // ← ШАГ 3: Создаём обновлённую задачу
                         val updatedTask = Task(
-                            id = taskId.toInt(),
+                            id = taskId,
                             title = title,
                             description = if (description.isNotEmpty()) description else null,
                             date = if (date.isNotEmpty()) date else null,

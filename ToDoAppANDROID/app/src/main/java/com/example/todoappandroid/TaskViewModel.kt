@@ -222,16 +222,40 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         if (task.date.isNullOrEmpty()) return@filter false
 
-                        val dateFormat = java.text.SimpleDateFormat("dd MMM. yyyy 'г.'", java.util.Locale("ru"))
-                        val parsedDate = dateFormat.parse(task.date) ?: return@filter false
+                        // Пробуем несколько форматов
+                        val dateFormats = listOf(
+                            "dd MMM. yyyy 'г.'",      // 24 нояб. 2025 г.
+                            "dd MMMM yyyy",            // 24 ноября 2025
+                            "dd.MM.yyyy",              // 24.11.2025
+                            "dd MMM yyyy"              // 24 Nov 2025
+                        )
+
+                        var parsedDate: java.util.Date? = null
+                        for (format in dateFormats) {
+                            try {
+                                val dateFormat = java.text.SimpleDateFormat(format, java.util.Locale("ru"))
+                                parsedDate = dateFormat.parse(task.date)
+                                if (parsedDate != null) break
+                            } catch (e: Exception) {
+                                // Пробуем следующий формат
+                            }
+                        }
+
+                        if (parsedDate == null) {
+                            android.util.Log.w("TaskViewModel", "Could not parse date: ${task.date}")
+                            return@filter false
+                        }
 
                         val calendar = Calendar.getInstance()
                         calendar.time = parsedDate
 
-                        calendar.get(Calendar.YEAR) == year &&
+                        val matches = calendar.get(Calendar.YEAR) == year &&
                                 calendar.get(Calendar.MONTH) + 1 == month &&
                                 calendar.get(Calendar.DAY_OF_MONTH) == day
+
+                        matches
                     } catch (e: Exception) {
+                        android.util.Log.e("TaskViewModel", "Error parsing date: ${task.date}", e)
                         false
                     }
                 }
@@ -247,6 +271,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
 
 
 }

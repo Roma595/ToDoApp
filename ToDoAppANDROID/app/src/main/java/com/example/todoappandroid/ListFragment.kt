@@ -141,28 +141,6 @@ class ListFragment : Fragment() {
         alarmManager.cancel(pendingIntent)
     }
 
-    private fun deleteTaskWithReminder(task: Task) {
-        if (task.reminder) {
-            val alarmManager = requireContext().getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
-
-            val intent = android.content.Intent(requireContext(), TaskNotificationReceiver::class.java).apply {
-                action = "com.example.todoappandroid.TASK_NOTIFICATION"
-                putExtra("taskId", task.id.toInt())
-                putExtra("taskTitle", task.title)
-            }
-
-            val pendingIntent = android.app.PendingIntent.getBroadcast(
-                requireContext(),
-                task.id.toInt(),
-                intent,
-                android.app.PendingIntent.FLAG_CANCEL_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE  // ← ИЗМЕНИТЕ на CANCEL_CURRENT
-            )
-
-            alarmManager.cancel(pendingIntent)
-        }
-
-        viewModel.removeTask(task)
-    }
 
     private fun showSortMenu() {
         val sortOptions = arrayOf(
@@ -224,7 +202,7 @@ class ListFragment : Fragment() {
     }
     private fun openEditTask(task: Task) {
         val bundle = Bundle().apply {
-            putInt("task_id", task.id)
+            putLong("task_id", task.id)
             putString("task_title", task.title)
             putString("task_description", task.description)
             putString("task_date", task.date)
