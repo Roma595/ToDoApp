@@ -224,7 +224,7 @@ class ListFragment : Fragment() {
     }
     private fun openEditTask(task: Task) {
         val bundle = Bundle().apply {
-            putLong("task_id", task.id)
+            putInt("task_id", task.id)
             putString("task_title", task.title)
             putString("task_description", task.description)
             putString("task_date", task.date)

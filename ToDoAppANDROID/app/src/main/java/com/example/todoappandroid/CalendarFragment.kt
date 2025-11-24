@@ -1,59 +1,82 @@
 package com.example.todoappandroid
-
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CalendarView
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.findNavController
+import java.util.Calendar
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CalendarFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CalendarFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var calendarView: CalendarView
+    private lateinit var tasksRecyclerView: RecyclerView
+    private lateinit var activeTaskAdapter: TaskAdapter
+    private val viewModel: TaskViewModel by activityViewModels()
+    private lateinit var tasksLabel: TextView
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_calendar, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CalendarFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CalendarFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        calendarView = view.findViewById(R.id.calendarView)
+        tasksRecyclerView = view.findViewById(R.id.tasksRecyclerView)
+        tasksLabel = view.findViewById(R.id.tasksLabel)
+
+        activeTaskAdapter = TaskAdapter(
+            onTaskToggle = { task -> viewModel.updateTask(task) },
+            onTaskClick = { task -> openEditTask(task) }
+        )
+        tasksRecyclerView.layoutManager = LinearLayoutManager(context)
+        tasksRecyclerView.adapter = activeTaskAdapter
+
+        val today = Calendar.getInstance()
+        calendarView.setDate(today.timeInMillis, false, true)
+        loadTasksForDate(
+            today.get(Calendar.YEAR),
+            today.get(Calendar.MONTH) + 1,
+            today.get(Calendar.DAY_OF_MONTH)
+        )
+
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            loadTasksForDate(year, month + 1, dayOfMonth)
+            val selectedDate = Calendar.getInstance().apply {
+                set(year, month, dayOfMonth)
             }
+        }
+    }
+
+    private fun loadTasksForDate(year: Int, month: Int, day: Int) {
+        viewModel.getTasksForDate(year, month, day)
+            .observe(viewLifecycleOwner) { allTasks ->
+                val activeTasks = allTasks.filter { !it.isCompleted }
+                activeTaskAdapter.submitList(activeTasks)
+                tasksLabel.text = "Задачи на $day.$month.$year"
+            }
+    }
+    private fun openEditTask(task: Task) {
+        val bundle = Bundle().apply {
+            putInt("task_id", task.id)
+            putString("task_title", task.title)
+            putString("task_description", task.description)
+            putString("task_date", task.date)
+            putString("task_category", task.category)
+            putBoolean("task_isCompleted", task.isCompleted)
+            putBoolean("task_reminder", task.reminder)
+            putString("task_reminder_date_time", task.reminderDateTime)
+        }
+        findNavController().navigate(R.id.action_navigation_calendar_to_profileFragment, bundle)
     }
 }

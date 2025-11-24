@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -213,5 +214,39 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             categoryDao.deleteByName(categoryName)
         }
     }
+    //Календарь
+    fun getTasksForDate(year: Int, month: Int, day: Int): LiveData<List<Task>> {
+        return object : LiveData<List<Task>>() {
+            private val observer = androidx.lifecycle.Observer<List<Task>> { allTasks ->
+                val filtered = allTasks.filter { task ->
+                    try {
+                        if (task.date.isNullOrEmpty()) return@filter false
+
+                        val dateFormat = java.text.SimpleDateFormat("dd MMM. yyyy 'г.'", java.util.Locale("ru"))
+                        val parsedDate = dateFormat.parse(task.date) ?: return@filter false
+
+                        val calendar = Calendar.getInstance()
+                        calendar.time = parsedDate
+
+                        calendar.get(Calendar.YEAR) == year &&
+                                calendar.get(Calendar.MONTH) + 1 == month &&
+                                calendar.get(Calendar.DAY_OF_MONTH) == day
+                    } catch (e: Exception) {
+                        false
+                    }
+                }
+                value = filtered
+            }
+
+            override fun onActive() {
+                tasks.observeForever(observer)
+            }
+
+            override fun onInactive() {
+                tasks.removeObserver(observer)
+            }
+        }
+    }
+
 
 }
