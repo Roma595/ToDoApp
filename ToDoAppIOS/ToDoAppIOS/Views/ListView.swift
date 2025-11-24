@@ -15,6 +15,10 @@ struct ListView: View {
     @State var showAddView: Bool = false
     
     var body: some View {
+        Text("Список задач")
+            .font(.title2)
+            .fontWeight(.bold)
+            .padding()
         NavigationStack{
             if (tasks.isEmpty ){
                 EmptyTasksView()
@@ -28,7 +32,7 @@ struct ListView: View {
             }
             else{
                 TaskListView()
-                .navigationTitle(Text("Список задач"))
+                //.navigationTitle(Text("Список задач"))
                 .toolbar{
                     ListViewToolbar(showAddView: $showAddView)
                 }
