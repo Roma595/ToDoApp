@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="TODOLIST.MainPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Simple Task Planner">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
+
+            <Label Text="Мои задачи" 
+                   FontSize="28" 
+                   HorizontalOptions="Center" />
+
+            <Entry x:Name="NewTaskEntry"
+                   Placeholder="Введите новую задачу..."
+                   HorizontalOptions="FillAndExpand" />
+
+            <Button Text="Добавить задачу" 
+                    Clicked="OnAddTaskClicked"
+                    HorizontalOptions="Fill"
+                    BackgroundColor="Blue"
+                    TextColor="White"/>
+
+            <CollectionView x:Name="TasksCollection">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10" ColumnDefinitions="40,*,40">
+                            <CheckBox Grid.Column="0" 
+                                      CheckedChanged="OnTaskCheckedChanged"
+                                      VerticalOptions="Center"/>
+
+                            <Label Grid.Column="1" 
+                                   Text="{Binding Text}" 
+                                   FontSize="16"
+                                   VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" 
+                                                 Binding="{Binding IsCompleted}" 
+                                                 Value="True">
+                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                        <Setter Property="TextColor" Value="Gray"/>
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+
+                            <Button Grid.Column="2" 
+                                    Text="X" 
+                                    Clicked="OnDeleteTaskClicked"
+                                    BackgroundColor="Red"
+                                    TextColor="White"
+                                    WidthRequest="40"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

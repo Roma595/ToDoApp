@@ -1,0 +1,53 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\\u042F\u0439\u0446\u0430\\source\\repos\\TODOLIST\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{518E7EC2-F615-4380-B68A-5D5D983836E3}|TODOLIST.csproj|c:\\users\\\u044F\u0439\u0446\u0430\\source\\repos\\todolist\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{518E7EC2-F615-4380-B68A-5D5D983836E3}|TODOLIST.csproj|solutionrelative:mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{518E7EC2-F615-4380-B68A-5D5D983836E3}|TODOLIST.csproj|c:\\users\\\u044F\u0439\u0446\u0430\\source\\repos\\todolist\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{518E7EC2-F615-4380-B68A-5D5D983836E3}|TODOLIST.csproj|solutionrelative:mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\\u042F\u0439\u0446\u0430\\source\\repos\\TODOLIST\\MainPage.xaml.cs",
+              "RelativeDocumentMoniker": "MainPage.xaml.cs",
+              "ToolTip": "C:\\Users\\\u042F\u0439\u0446\u0430\\source\\repos\\TODOLIST\\MainPage.xaml.cs",
+              "RelativeToolTip": "MainPage.xaml.cs",
+              "ViewState": "AgIAACgAAAAAAAAAAAAqwCgAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-23T20:10:03.903Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainPage.xaml",
+              "DocumentMoniker": "C:\\Users\\\u042F\u0439\u0446\u0430\\source\\repos\\TODOLIST\\MainPage.xaml",
+              "RelativeDocumentMoniker": "MainPage.xaml",
+              "ToolTip": "C:\\Users\\\u042F\u0439\u0446\u0430\\source\\repos\\TODOLIST\\MainPage.xaml",
+              "RelativeToolTip": "MainPage.xaml",
+              "ViewState": "AgIAACcAAAAAAAAAAAAwwDIAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-11-23T20:06:03.74Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
