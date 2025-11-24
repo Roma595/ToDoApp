@@ -14,7 +14,7 @@ struct DatePickerView: View {
     
     var body: some View {
         NavigationStack{
-            VStack{
+            
                 DatePicker(
                     "",
                     selection: Binding(
@@ -29,7 +29,6 @@ struct DatePickerView: View {
                 
                 Spacer()
                 
-            }
             .toolbar{
                 DataPickerViewToolbar(selectedDate: $selectedDate)
             }

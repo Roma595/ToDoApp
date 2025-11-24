@@ -122,7 +122,7 @@ struct AddTaskView: View {
                 switch sheet {
                 case .date:
                     DatePickerView(selectedDate: $selectedDate)
-                        .presentationDetents([.medium])
+                        .presentationDetents([.height(450)])
                         .interactiveDismissDisabled(true)
                 case .notification:
                     NotificationDatePickerView(selectedDateTime: $notificationDateTime)

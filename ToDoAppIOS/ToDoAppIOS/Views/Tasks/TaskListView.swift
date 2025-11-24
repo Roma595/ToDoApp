@@ -52,26 +52,45 @@ struct TaskListView: View {
     var body: some View {
         VStack{
             HStack{
-                Picker("Категория",selection: $selectedCategory) {
+                Menu{
                     ForEach(categories, id: \.self) { option in
-                        Text(option)
+                        Button(action: {selectedCategory = option}){
+                            Text(option)
+                        }
+                        
                     }
+                } label: {
+                    HStack(spacing: 4) {
+                        //Text("Фильтр: ")
+                        Text(selectedCategory)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                        Image(systemName: "chevron.down")
+                            
+                        Spacer()
+                    }
+                    .frame(maxWidth: 500)
+                    .foregroundColor(.blue)
+                }
+                Spacer()
+                
+                Picker("Категория",selection: $selectedCategory) {
+                    
                 }
                 .padding(.horizontal)
                 .pickerStyle(.menu)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Picker(selection: $sortType, label: HStack {
-                    Image(systemName: "chevron.down")
-                    Text("Сортировка")
                 }) {
                     ForEach(SortType.allCases) { type in
-                        Text(type.rawValue).tag(type)
+                        Text(type.rawValue).tag(type).lineLimit(1)
+                            .truncationMode(.tail)
                     }
                 }
-                .padding(.horizontal)
                 .pickerStyle(.menu)
             }
+            .padding(.horizontal)
             
             List{
                 Section(header: Text("Активные задачи")) {
