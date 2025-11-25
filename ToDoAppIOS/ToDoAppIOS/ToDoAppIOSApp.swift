@@ -1,0 +1,23 @@
+//
+//  ToDoAppIOSApp.swift
+//  ToDoAppIOS
+//
+//  Created by Рома Котков on 15.09.2025.
+//
+
+import SwiftUI
+
+@main
+struct ToDoAppIOSApp: App {
+    
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
+    var body: some Scene {
+        WindowGroup {
+            NavigationView {
+                ContextView()
+                    .modelContainer(for: [CategoryModel.self, TaskModel.self])
+            }
+        }
+    }
+}
