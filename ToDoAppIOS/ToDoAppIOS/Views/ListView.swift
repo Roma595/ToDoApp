@@ -25,7 +25,7 @@ struct ListView: View {
                     .navigationTitle(Text("Список задач"))
                     .navigationBarTitleDisplayMode(.inline)
                     .sheet(isPresented: $showAddView) {
-                        AddTaskView()
+                        AddTaskView(showAddView: $showAddView)
                             .interactiveDismissDisabled(true)
                     }
             }
@@ -38,7 +38,7 @@ struct ListView: View {
                     .navigationBarTitleDisplayMode(.inline)
                     //.navigationTitle(Text("Список задач"))
                     .sheet(isPresented: $showAddView) {
-                        AddTaskView()
+                        AddTaskView(showAddView: $showAddView)
                             .interactiveDismissDisabled(true)
                     }
                 //.navigationTitle(Text("Список задач"))

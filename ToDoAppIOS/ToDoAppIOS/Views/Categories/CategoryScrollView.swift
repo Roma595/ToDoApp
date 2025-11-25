@@ -45,7 +45,7 @@ struct CategoryScrollView: View {
                                     .foregroundStyle(.white)
                             )
                             .padding(.vertical, 6)
-                        Text("Новая").font(.caption)
+                        Text("Новая").font(.caption).foregroundColor(.black)
                     }
                 }
             }

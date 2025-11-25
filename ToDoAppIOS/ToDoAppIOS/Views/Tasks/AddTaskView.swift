@@ -24,6 +24,7 @@ struct AddTaskView: View {
     @State private var taskNote: String = ""
     
     let notificationMessage: String = "Не забудь выполнить задачу. Скорее посмотри ее!"
+    @Binding var showAddView: Bool
     
     @FocusState private var isFocusedText: Bool
     
@@ -158,6 +159,7 @@ struct AddTaskView: View {
             NotificationManager.shared.schedule(title: newTask.name, body: notificationMessage, date: notificationDateTime!, taskId: newTask.id)
         }
         try_save_context()
+        showAddView = false
     }
     
     private var dateFormatter: DateFormatter {
@@ -177,5 +179,5 @@ struct AddTaskView: View {
 
 // MARK: - Preview
 #Preview {
-    AddTaskView()
+    AddTaskView(showAddView: .constant(true))
 }
