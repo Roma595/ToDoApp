@@ -1,0 +1,1 @@
+-v --force --timestamp=none --sign - /Users/romakotkov/Учеба/ToDoAppNET/ToDoApp/TODOLIST/bin/Debug/net9.0-ios/iossimulator-arm64/TODOLIST.app/libSystem.Globalization.Native.dylib
